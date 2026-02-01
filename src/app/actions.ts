@@ -52,7 +52,7 @@ export async function removeTask(slug: string) {
 export async function createPipelineItem(formData: FormData) {
   const title = formData.get('title') as string;
   const type = (formData.get('type') as string || 'post') as 'post' | 'article' | 'talk';
-  const status = (formData.get('status') as string || 'idea') as 'idea' | 'drafting' | 'review' | 'published';
+  const status = (formData.get('status') as string || 'ideas') as 'ideas' | 'drafting' | 'review' | 'published';
   const notes = formData.get('notes') as string;
   
   if (!title) return { error: 'Title is required' };
@@ -70,7 +70,7 @@ export async function updatePipelineStatus(slug: string, newStatus: string) {
   
   if (!item) return { error: 'Item not found' };
   
-  savePipelineItem({ ...item, status: newStatus });
+  savePipelineItem({ ...item, status: newStatus as 'ideas' | 'drafting' | 'review' | 'published' });
   revalidatePath('/content');
   revalidatePath('/');
   return { success: true };
