@@ -11,7 +11,7 @@ type Category = 'documents' | 'tasks' | 'pipeline' | 'projects' | 'decisions';
 
 const categories: { value: Category; label: string; icon: React.ReactNode; fields?: string[] }[] = [
   { value: 'documents', label: 'Document', icon: <FileText className="w-4 h-4" /> },
-  { value: 'tasks', label: 'Task', icon: <CheckSquare className="w-4 h-4" />, fields: ['status'] },
+  { value: 'tasks', label: 'Task', icon: <CheckSquare className="w-4 h-4" />, fields: ['status', 'assignee'] },
   { value: 'pipeline', label: 'Content Idea', icon: <Lightbulb className="w-4 h-4" />, fields: ['type', 'status'] },
   { value: 'projects', label: 'Project', icon: <Rocket className="w-4 h-4" />, fields: ['status', 'description'] },
   { value: 'decisions', label: 'Decision', icon: <Brain className="w-4 h-4" />, fields: ['status', 'context'] },
@@ -25,6 +25,7 @@ export default function QuickAdd({ onCreated }: QuickAddProps) {
   const [tags, setTags] = useState('');
   const [status, setStatus] = useState('');
   const [type, setType] = useState('post');
+  const [assignee, setAssignee] = useState<'tom' | 'molty'>('tom');
   const [description, setDescription] = useState('');
   const [context, setContext] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,6 +43,7 @@ export default function QuickAdd({ onCreated }: QuickAddProps) {
       
       if (status) frontmatter.status = status;
       if (type && category === 'pipeline') frontmatter.type = type;
+      if (category === 'tasks') frontmatter.assignee = assignee;
       if (description) frontmatter.description = description;
       if (context) frontmatter.context = context;
 
@@ -68,6 +70,7 @@ export default function QuickAdd({ onCreated }: QuickAddProps) {
       setTags('');
       setStatus('');
       setType('post');
+      setAssignee('tom');
       setDescription('');
       setContext('');
       setIsOpen(false);
@@ -183,6 +186,20 @@ export default function QuickAdd({ onCreated }: QuickAddProps) {
                         <option value="superseded">Superseded</option>
                       </>
                     )}
+                  </select>
+                </div>
+              )}
+
+              {selectedCategory?.fields?.includes('assignee') && (
+                <div>
+                  <label className="block text-sm font-medium text-[#8b949e] mb-1">Assignee</label>
+                  <select
+                    value={assignee}
+                    onChange={e => setAssignee(e.target.value as 'tom' | 'molty')}
+                    className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-[#e6edf3] focus:outline-none focus:border-[#58a6ff]"
+                  >
+                    <option value="tom">👤 Tom</option>
+                    <option value="molty">🦉 Molty</option>
                   </select>
                 </div>
               )}

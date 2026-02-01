@@ -6,11 +6,12 @@ import { revalidatePath } from 'next/cache';
 export async function createTask(formData: FormData) {
   const title = formData.get('title') as string;
   const status = formData.get('status') as string || 'now';
+  const assignee = formData.get('assignee') as 'tom' | 'molty' || 'tom';
   const notes = formData.get('notes') as string;
   
   if (!title) return { error: 'Title is required' };
   
-  saveTask({ title, status, notes });
+  saveTask({ title, status, assignee, notes });
   revalidatePath('/tasks');
   revalidatePath('/');
   return { success: true };

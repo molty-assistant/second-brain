@@ -8,8 +8,10 @@ const contentDirectory = path.join(process.cwd(), 'content');
 export interface Task {
   slug: string;
   title: string;
-  status: 'now' | 'next' | 'later';
+  status: 'now' | 'next' | 'later' | 'done';
+  assignee: 'tom' | 'molty';
   created: string;
+  completed?: string;
   notes?: string;
   content?: string;
 }
@@ -32,19 +34,28 @@ export function getTasks(): Task[] {
     } else {
       createdStr = data.created || fs.statSync(filePath).mtime.toISOString().split('T')[0];
     }
+
+    let completedStr: string | undefined;
+    if (data.completed instanceof Date) {
+      completedStr = data.completed.toISOString().split('T')[0];
+    } else if (data.completed) {
+      completedStr = String(data.completed);
+    }
     
     return {
       slug,
       title: data.title || slug,
       status: data.status || 'later',
+      assignee: data.assignee || 'tom',
       created: createdStr,
+      completed: completedStr,
       notes: data.notes,
       content: content.trim(),
     };
   }).sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
 }
 
-export function getTasksByStatus(status: 'now' | 'next' | 'later'): Task[] {
+export function getTasksByStatus(status: 'now' | 'next' | 'later' | 'done'): Task[] {
   return getTasks().filter(t => t.status === status);
 }
 
@@ -57,12 +68,17 @@ export function saveTask(task: Partial<Task> & { title: string; status: string }
   const slug = task.slug || task.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   const filePath = path.join(tasksDir, `${slug}.md`);
   
-  const frontmatter = {
+  const frontmatter: Record<string, unknown> = {
     title: task.title,
     status: task.status,
+    assignee: task.assignee || 'tom',
     created: task.created || new Date().toISOString().split('T')[0],
-    ...(task.notes && { notes: task.notes }),
   };
+
+  if (task.notes) frontmatter.notes = task.notes;
+  if (task.status === 'done') {
+    frontmatter.completed = task.completed || new Date().toISOString().split('T')[0];
+  }
   
   const content = matter.stringify(task.content || '', frontmatter);
   fs.writeFileSync(filePath, content);

@@ -17,8 +17,10 @@ function ensureDateString(date: unknown, fallback: Date): string {
 export interface Task {
   slug: string;
   title: string;
-  status: 'now' | 'next' | 'later';
+  status: 'now' | 'next' | 'later' | 'done';
+  assignee: 'tom' | 'molty';
   created: string;
+  completed?: string;
   notes?: string;
   content?: string;
 }
@@ -39,7 +41,9 @@ export function getTasks(): Task[] {
         slug: file.replace(/\.md$/, ''),
         title: data.title || file.replace(/\.md$/, '').replace(/-/g, ' '),
         status: data.status || 'later',
+        assignee: data.assignee || 'tom',
         created: ensureDateString(data.created, stat.mtime),
+        completed: data.completed ? ensureDateString(data.completed, new Date()) : undefined,
         notes: data.notes,
         content: content.trim(),
       };
@@ -47,7 +51,7 @@ export function getTasks(): Task[] {
     .sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
 }
 
-export function getTasksByStatus(status: 'now' | 'next' | 'later'): Task[] {
+export function getTasksByStatus(status: 'now' | 'next' | 'later' | 'done'): Task[] {
   return getTasks().filter(t => t.status === status);
 }
 

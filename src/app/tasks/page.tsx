@@ -1,4 +1,4 @@
-import { getTasks } from '@/lib/content';
+import { getTasks } from '@/lib/hub';
 import { getDocumentsByCategory } from '@/lib/documents';
 import Sidebar from '@/components/Sidebar';
 import TaskBoard from '@/components/TaskBoard';
@@ -14,6 +14,7 @@ export default function TasksPage() {
   const nowTasks = tasks.filter(t => t.status === 'now');
   const nextTasks = tasks.filter(t => t.status === 'next');
   const laterTasks = tasks.filter(t => t.status === 'later');
+  const doneTasks = tasks.filter(t => t.status === 'done');
 
   return (
     <div className="flex min-h-screen">
@@ -28,14 +29,15 @@ export default function TasksPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold text-[#e6edf3]">Tasks</h1>
-              <p className="text-[#8b949e]">Now / Next / Later</p>
+              <p className="text-[#8b949e]">Now / Next / Later / Done</p>
             </div>
           </div>
 
           <TaskBoard 
             nowTasks={nowTasks} 
             nextTasks={nextTasks} 
-            laterTasks={laterTasks} 
+            laterTasks={laterTasks}
+            doneTasks={doneTasks}
           />
         </div>
       </main>
