@@ -36,6 +36,17 @@ tags: [concept, important]
 # Content goes here...
 ```
 
+## Authentication
+
+The app supports optional Basic Auth protection via environment variables:
+
+```bash
+BASIC_AUTH_USER=your-username
+BASIC_AUTH_PASS=your-password
+```
+
+If these are not set, the app runs without authentication (useful for local development).
+
 ## Getting Started
 
 ```bash
