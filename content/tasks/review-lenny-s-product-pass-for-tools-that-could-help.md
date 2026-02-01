@@ -62,3 +62,15 @@ Visual workflow builder. I could set up:
 
 Want me to sign up to any of these? Or do you want to grab the Lenny codes first?
 
+---
+
+## 🦉 Update: Full Deep Dive Complete
+
+See **Documents → "Lenny's Product Pass — Deep Analysis for Molty"** for the complete analysis of all 26 tools including:
+- Access method for each (API/CLI/MCP/Browser)
+- Whether I can actually use it
+- Detailed use cases
+- Prioritized recommendations
+
+**Key finding:** CLI/API tools (Railway, n8n) are highest confidence. Browser tools (Bolt, Lovable, Replit) are possible but need testing.
+
