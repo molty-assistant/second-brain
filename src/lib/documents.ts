@@ -48,10 +48,20 @@ function getFilesRecursively(dir: string, category: 'documents' | 'journal'): Do
       // Extract first paragraph as excerpt
       const excerpt = content.split('\n\n')[0]?.substring(0, 200) || '';
       
+      // Ensure date is always a string (gray-matter auto-parses YAML dates)
+      let dateStr: string;
+      if (data.date instanceof Date) {
+        dateStr = data.date.toISOString().split('T')[0];
+      } else if (data.date) {
+        dateStr = String(data.date);
+      } else {
+        dateStr = stat.mtime.toISOString().split('T')[0];
+      }
+      
       documents.push({
         slug: `${category}/${slug}`,
         title: data.title || slug.replace(/-/g, ' ').replace(/^\w/, c => c.toUpperCase()),
-        date: data.date || stat.mtime.toISOString().split('T')[0],
+        date: dateStr,
         category,
         tags: data.tags || [],
         excerpt: excerpt.replace(/[#*_`]/g, '').trim(),
@@ -94,10 +104,20 @@ export async function getDocument(slug: string): Promise<Document | null> {
   
   const stat = fs.statSync(filePath);
   
+  // Ensure date is always a string
+  let dateStr: string;
+  if (data.date instanceof Date) {
+    dateStr = data.date.toISOString().split('T')[0];
+  } else if (data.date) {
+    dateStr = String(data.date);
+  } else {
+    dateStr = stat.mtime.toISOString().split('T')[0];
+  }
+  
   return {
     slug,
     title: data.title || fileName.replace(/-/g, ' ').replace(/^\w/, c => c.toUpperCase()),
-    date: data.date || stat.mtime.toISOString().split('T')[0],
+    date: dateStr,
     category: category as 'documents' | 'journal',
     tags: data.tags || [],
     content,
