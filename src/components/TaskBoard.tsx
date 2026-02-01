@@ -81,10 +81,29 @@ function TaskDetailPanel({
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState(task);
+  const [newUpdate, setNewUpdate] = useState('');
+  const [updateAuthor, setUpdateAuthor] = useState<'tom' | 'molty'>('tom');
 
   const handleSave = () => {
     onUpdate(task.slug, editedTask);
     setIsEditing(false);
+  };
+
+  const handleAddUpdate = () => {
+    if (!newUpdate.trim()) return;
+    
+    const timestamp = new Date().toLocaleDateString('en-GB', { 
+      day: 'numeric', 
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    const authorLabel = updateAuthor === 'molty' ? '🦉 Molty' : '👤 Tom';
+    const updateLine = `\n\n---\n**${authorLabel}** (${timestamp}):\n${newUpdate.trim()}`;
+    
+    const updatedContent = (task.content || '') + updateLine;
+    onUpdate(task.slug, { content: updatedContent });
+    setNewUpdate('');
   };
 
   return (
@@ -188,27 +207,62 @@ function TaskDetailPanel({
             )}
           </div>
 
-          {/* Content/Description */}
+          {/* Content/Description & Updates */}
           <div>
-            <label className="block text-xs font-medium text-[#8b949e] uppercase tracking-wide mb-2">Description</label>
+            <label className="block text-xs font-medium text-[#8b949e] uppercase tracking-wide mb-2">
+              Description & Updates
+            </label>
             {isEditing ? (
               <textarea
                 value={editedTask.content || ''}
                 onChange={e => setEditedTask({ ...editedTask, content: e.target.value })}
-                rows={6}
+                rows={8}
                 className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-[#e6edf3] focus:outline-none focus:border-[#58a6ff] resize-none font-mono text-sm"
                 placeholder="Detailed description (markdown supported)..."
               />
             ) : (
-              <div className="bg-[#0d1117] border border-[#30363d] rounded-md p-3">
+              <div className="bg-[#0d1117] border border-[#30363d] rounded-md p-3 max-h-64 overflow-y-auto">
                 {task.content ? (
                   <pre className="text-sm text-[#e6edf3] whitespace-pre-wrap font-sans">{task.content}</pre>
                 ) : (
-                  <p className="text-[#6e7681] italic">No description</p>
+                  <p className="text-[#6e7681] italic">No description yet</p>
                 )}
               </div>
             )}
           </div>
+
+          {/* Add Update (quick note without full edit mode) */}
+          {!isEditing && (
+            <div className="bg-[#21262d] border border-[#30363d] rounded-lg p-4">
+              <label className="block text-xs font-medium text-[#8b949e] uppercase tracking-wide mb-2">
+                Add Update
+              </label>
+              <textarea
+                value={newUpdate}
+                onChange={e => setNewUpdate(e.target.value)}
+                rows={2}
+                className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-[#e6edf3] placeholder-[#6e7681] focus:outline-none focus:border-[#58a6ff] resize-none text-sm mb-2"
+                placeholder="Add a note, handoff context, or update..."
+              />
+              <div className="flex items-center gap-2">
+                <select
+                  value={updateAuthor}
+                  onChange={e => setUpdateAuthor(e.target.value as 'tom' | 'molty')}
+                  className="bg-[#0d1117] border border-[#30363d] rounded-md px-2 py-1 text-sm text-[#e6edf3] focus:outline-none focus:border-[#58a6ff]"
+                >
+                  <option value="tom">👤 Tom</option>
+                  <option value="molty">🦉 Molty</option>
+                </select>
+                <button
+                  onClick={handleAddUpdate}
+                  disabled={!newUpdate.trim()}
+                  className="px-3 py-1 bg-[#238636] hover:bg-[#2ea043] text-white text-sm rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Dates */}
           <div className="flex gap-4 text-sm text-[#8b949e]">
