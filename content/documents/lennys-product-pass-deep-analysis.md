@@ -166,13 +166,25 @@ Analysed all 26 tools on Lenny's Product Pass. For each tool, I checked:
 
 ## 🔴 LOW VALUE FOR ME — Tools for You, Not Me
 
-### 14. Warp
-**What it does:** AI-powered terminal
-**Access method:** Desktop app
-**Can I use it?** ❌ NOT USEFUL — I already have terminal access via exec
-**Why:** Warp is a better terminal for *humans*. I don't need a fancy terminal — I execute commands directly.
+### 14. Warp ⚠️ UPDATED
+**What it does:** AI-powered terminal + Agent Platform
+**Access method:** CLI (`warp agent run`) + API keys
+**Can I use it?** ✅ YES — Via CLI commands
+**Why I was wrong:** Warp isn't just a terminal — it has an **Agent Platform** with:
+- CLI for running ambient agents headlessly
+- API key auth for automated use
+- MCP connections to GitHub, Linear, etc.
+- Cloud-connected execution with audit trail
 
-**However:** Warp has an "Agent Platform" and ambient agents feature. If this has an API, it could be interesting for running background tasks. Worth investigating further.
+**Use cases:**
+- Run Warp agents for tasks I can't do directly (e.g., deeper GitHub integrations via MCP)
+- Background agents for PR review, issue triage
+- Another AI I can invoke for specialized tasks
+
+**Setup needed:**
+1. Install Warp desktop or CLI
+2. `warp login` to authenticate
+3. Provide API key or auth to me
 
 ### 15. Superhuman
 **What it does:** Fast email client
@@ -251,22 +263,27 @@ Analysed all 26 tools on Lenny's Product Pass. For each tool, I checked:
 
 ## 📋 Recommendations (Prioritized)
 
-### Tier 1 — Get These First (API/CLI Access)
+### Tier 1 — Get These First (CLI Access = Highest Confidence)
 | Tool | Why | Setup Effort |
 |------|-----|--------------|
-| **Railway** | Deploy anything to the web. Unlock localhost → live | Install CLI, get token |
-| **n8n** | Background automations run 24/7 without me | Self-host or cloud + API key |
+| **Railway** | Deploy anything to the web. Unlock localhost → live | Install CLI, get API token |
+| **Warp** | Agent platform with GitHub/Linear MCP, headless agents | Install app/CLI, API key |
 
-### Tier 2 — High Value if Browser Automation Works Well
+### Tier 2 — High Value (API Access)
+| Tool | Why | Setup Effort |
+|------|-----|--------------|
+| **n8n** | Background automations run 24/7 without me | Self-host or cloud + API key |
+| **Perplexity API** | Better research with citations | API key |
+
+### Tier 3 — High Value if Browser Automation Works
 | Tool | Why | Setup Effort |
 |------|-----|--------------|
 | **Replit** | Build apps via prompt, instant deploy | Account + browser access |
 | **Bolt or Lovable** | Quick app/site prototypes | Account + browser access |
 
-### Tier 3 — Nice to Have
+### Tier 4 — Nice to Have
 | Tool | Why | Setup Effort |
 |------|-----|--------------|
-| **Perplexity API** | Better research with citations | API key |
 | **Linear** | Alternative task tracking with API | API key |
 | **ChatPRD** | PRD drafting (browser) | Account |
 
@@ -288,12 +305,19 @@ Want me to run this test?
 
 ---
 
+---
+
+## 🔍 ClawdHub — Skills to Watch
+
+OpenClaw has a skills hub at clawdhub.com. I should periodically check for new skills that could expand my capabilities. Skills could provide:
+- New integrations (Notion, Airtable, etc.)
+- Specialized tools (video editing, image generation)
+- Workflow automations
+
+**Action:** Periodically run `clawdhub search` for relevant skills.
+
+---
+
 ## Next Steps
 
-1. **You grab Lenny codes** for Railway + Replit (or Bolt/Lovable)
-2. **Install Railway CLI** — `npm install -g @railway/cli`
-3. **Give me Railway auth** — I can then deploy Mission Control
-4. **Test browser automation** with one of the builder tools
-5. **Set up n8n** for background automations
-
-Let me know which to proceed with first.
+See **Tasks** section in Mission Control — I've created prioritized to-do items for Tom with specific setup instructions for each tool.
