@@ -51,8 +51,8 @@ export async function removeTask(slug: string) {
 
 export async function createPipelineItem(formData: FormData) {
   const title = formData.get('title') as string;
-  const type = formData.get('type') as string || 'post';
-  const status = formData.get('status') as string || 'ideas';
+  const type = (formData.get('type') as string || 'post') as 'post' | 'article' | 'talk';
+  const status = (formData.get('status') as string || 'idea') as 'idea' | 'drafting' | 'review' | 'published';
   const notes = formData.get('notes') as string;
   
   if (!title) return { error: 'Title is required' };
