@@ -10,11 +10,6 @@ export default function TasksPage() {
   const documents = getDocumentsByCategory('documents');
   const journalEntries = getDocumentsByCategory('journal');
   const tasks = getTasks();
-  
-  const nowTasks = tasks.filter(t => t.status === 'now');
-  const nextTasks = tasks.filter(t => t.status === 'next');
-  const laterTasks = tasks.filter(t => t.status === 'later');
-  const doneTasks = tasks.filter(t => t.status === 'done');
 
   return (
     <div className="flex min-h-screen">
@@ -29,16 +24,11 @@ export default function TasksPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold text-[#e6edf3]">Tasks</h1>
-              <p className="text-[#8b949e]">Now / Next / Later / Done</p>
+              <p className="text-[#8b949e]">To Do → In Progress → Review → Done</p>
             </div>
           </div>
 
-          <TaskBoard 
-            nowTasks={nowTasks} 
-            nextTasks={nextTasks} 
-            laterTasks={laterTasks}
-            doneTasks={doneTasks}
-          />
+          <TaskBoard tasks={tasks} />
         </div>
       </main>
     </div>

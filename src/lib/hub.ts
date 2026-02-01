@@ -17,7 +17,8 @@ function ensureDateString(date: unknown, fallback: Date): string {
 export interface Task {
   slug: string;
   title: string;
-  status: 'now' | 'next' | 'later' | 'done';
+  status: 'todo' | 'in-progress' | 'review' | 'done';
+  priority: 'now' | 'next' | 'later';
   assignee: 'tom' | 'molty';
   created: string;
   completed?: string;
@@ -37,10 +38,23 @@ export function getTasks(): Task[] {
       const { data, content } = matter(fileContents);
       const stat = fs.statSync(filePath);
       
+      // Migration: old status values → new
+      let status = data.status || 'todo';
+      if (status === 'now' || status === 'next' || status === 'later') {
+        status = 'todo'; // Old priority-based statuses become todo
+      }
+      
+      // Priority: use old status if it was priority-based, otherwise default
+      let priority = data.priority || 'next';
+      if (data.status === 'now' || data.status === 'next' || data.status === 'later') {
+        priority = data.status;
+      }
+      
       return {
         slug: file.replace(/\.md$/, ''),
         title: data.title || file.replace(/\.md$/, '').replace(/-/g, ' '),
-        status: data.status || 'later',
+        status: status as Task['status'],
+        priority: priority as Task['priority'],
         assignee: data.assignee || 'tom',
         created: ensureDateString(data.created, stat.mtime),
         completed: data.completed ? ensureDateString(data.completed, new Date()) : undefined,
@@ -51,7 +65,7 @@ export function getTasks(): Task[] {
     .sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
 }
 
-export function getTasksByStatus(status: 'now' | 'next' | 'later' | 'done'): Task[] {
+export function getTasksByStatus(status: Task['status']): Task[] {
   return getTasks().filter(t => t.status === status);
 }
 
@@ -195,10 +209,17 @@ export function getStats() {
   const tasks = getTasks();
   const pipeline = getPipelineItems();
   
+  const activeTasks = tasks.filter(t => t.status !== 'done');
+  
   return {
-    tasksNow: tasks.filter(t => t.status === 'now').length,
-    tasksNext: tasks.filter(t => t.status === 'next').length,
-    tasksLater: tasks.filter(t => t.status === 'later').length,
+    tasksTodo: tasks.filter(t => t.status === 'todo').length,
+    tasksInProgress: tasks.filter(t => t.status === 'in-progress').length,
+    tasksReview: tasks.filter(t => t.status === 'review').length,
+    tasksDone: tasks.filter(t => t.status === 'done').length,
+    // Priority-based counts for active tasks
+    tasksNow: activeTasks.filter(t => t.priority === 'now').length,
+    tasksNext: activeTasks.filter(t => t.priority === 'next').length,
+    tasksLater: activeTasks.filter(t => t.priority === 'later').length,
     contentIdeas: pipeline.filter(p => p.status === 'idea').length,
     contentDrafting: pipeline.filter(p => p.status === 'drafting').length,
   };

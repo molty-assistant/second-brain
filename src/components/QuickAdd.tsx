@@ -11,7 +11,7 @@ type Category = 'documents' | 'tasks' | 'pipeline' | 'projects' | 'decisions';
 
 const categories: { value: Category; label: string; icon: React.ReactNode; fields?: string[] }[] = [
   { value: 'documents', label: 'Document', icon: <FileText className="w-4 h-4" /> },
-  { value: 'tasks', label: 'Task', icon: <CheckSquare className="w-4 h-4" />, fields: ['status', 'assignee'] },
+  { value: 'tasks', label: 'Task', icon: <CheckSquare className="w-4 h-4" />, fields: ['status', 'priority', 'assignee'] },
   { value: 'pipeline', label: 'Content Idea', icon: <Lightbulb className="w-4 h-4" />, fields: ['type', 'status'] },
   { value: 'projects', label: 'Project', icon: <Rocket className="w-4 h-4" />, fields: ['status', 'description'] },
   { value: 'decisions', label: 'Decision', icon: <Brain className="w-4 h-4" />, fields: ['status', 'context'] },
@@ -24,6 +24,7 @@ export default function QuickAdd({ onCreated }: QuickAddProps) {
   const [content, setContent] = useState('');
   const [tags, setTags] = useState('');
   const [status, setStatus] = useState('');
+  const [priority, setPriority] = useState<'now' | 'next' | 'later'>('next');
   const [type, setType] = useState('post');
   const [assignee, setAssignee] = useState<'tom' | 'molty'>('tom');
   const [description, setDescription] = useState('');
@@ -43,7 +44,10 @@ export default function QuickAdd({ onCreated }: QuickAddProps) {
       
       if (status) frontmatter.status = status;
       if (type && category === 'pipeline') frontmatter.type = type;
-      if (category === 'tasks') frontmatter.assignee = assignee;
+      if (category === 'tasks') {
+        frontmatter.assignee = assignee;
+        frontmatter.priority = priority;
+      }
       if (description) frontmatter.description = description;
       if (context) frontmatter.context = context;
 
@@ -69,6 +73,7 @@ export default function QuickAdd({ onCreated }: QuickAddProps) {
       setContent('');
       setTags('');
       setStatus('');
+      setPriority('next');
       setType('post');
       setAssignee('tom');
       setDescription('');
@@ -157,9 +162,9 @@ export default function QuickAdd({ onCreated }: QuickAddProps) {
                   >
                     {category === 'tasks' && (
                       <>
-                        <option value="now">Now</option>
-                        <option value="next">Next</option>
-                        <option value="later">Later</option>
+                        <option value="todo">To Do</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="review">Review</option>
                       </>
                     )}
                     {category === 'pipeline' && (
@@ -186,6 +191,21 @@ export default function QuickAdd({ onCreated }: QuickAddProps) {
                         <option value="superseded">Superseded</option>
                       </>
                     )}
+                  </select>
+                </div>
+              )}
+
+              {selectedCategory?.fields?.includes('priority') && (
+                <div>
+                  <label className="block text-sm font-medium text-[#8b949e] mb-1">Priority</label>
+                  <select
+                    value={priority}
+                    onChange={e => setPriority(e.target.value as 'now' | 'next' | 'later')}
+                    className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-[#e6edf3] focus:outline-none focus:border-[#58a6ff]"
+                  >
+                    <option value="now">🔴 Now</option>
+                    <option value="next">🟠 Next</option>
+                    <option value="later">⚪ Later</option>
                   </select>
                 </div>
               )}

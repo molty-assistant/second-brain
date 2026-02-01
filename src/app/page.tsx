@@ -32,7 +32,11 @@ function formatDate(date: Date) {
 
 export default function Dashboard() {
   const stats = getStats();
-  const tasksNow = getTasks().filter(t => t.status === 'now').slice(0, 5);
+  const allTasks = getTasks();
+  // Show high priority tasks that aren't done
+  const urgentTasks = allTasks.filter(t => t.status !== 'done' && t.priority === 'now').slice(0, 5);
+  // Show tasks in progress
+  const inProgressTasks = allTasks.filter(t => t.status === 'in-progress').slice(0, 5);
   const recentDocs = getDocumentsByCategory('documents').slice(0, 3);
   const recentJournal = getDocumentsByCategory('journal').slice(0, 3);
   const contentIdeas = getPipelineItems().filter(p => p.status === 'idea').slice(0, 3);
@@ -56,24 +60,24 @@ export default function Dashboard() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8">
           <Link href="/tasks" className="bg-[#161b22] border border-[#30363d] rounded-lg p-4 hover:border-[#58a6ff]/50 transition-colors">
             <div className="flex items-center gap-2 mb-1">
-              <CheckSquare className="w-4 h-4 text-[#f0883e]" />
-              <span className="text-xs text-[#8b949e]">Now</span>
+              <CheckSquare className="w-4 h-4 text-[#8b949e]" />
+              <span className="text-xs text-[#8b949e]">To Do</span>
             </div>
-            <div className="text-2xl font-bold text-[#e6edf3]">{stats.tasksNow}</div>
+            <div className="text-2xl font-bold text-[#e6edf3]">{stats.tasksTodo}</div>
           </Link>
           <Link href="/tasks" className="bg-[#161b22] border border-[#30363d] rounded-lg p-4 hover:border-[#58a6ff]/50 transition-colors">
             <div className="flex items-center gap-2 mb-1">
-              <Clock className="w-4 h-4 text-[#a371f7]" />
-              <span className="text-xs text-[#8b949e]">Next</span>
+              <Clock className="w-4 h-4 text-[#58a6ff]" />
+              <span className="text-xs text-[#8b949e]">In Progress</span>
             </div>
-            <div className="text-2xl font-bold text-[#e6edf3]">{stats.tasksNext}</div>
+            <div className="text-2xl font-bold text-[#e6edf3]">{stats.tasksInProgress}</div>
           </Link>
           <Link href="/tasks" className="bg-[#161b22] border border-[#30363d] rounded-lg p-4 hover:border-[#58a6ff]/50 transition-colors">
             <div className="flex items-center gap-2 mb-1">
-              <FileText className="w-4 h-4 text-[#6e7681]" />
-              <span className="text-xs text-[#8b949e]">Later</span>
+              <FileText className="w-4 h-4 text-[#a371f7]" />
+              <span className="text-xs text-[#8b949e]">Review</span>
             </div>
-            <div className="text-2xl font-bold text-[#e6edf3]">{stats.tasksLater}</div>
+            <div className="text-2xl font-bold text-[#e6edf3]">{stats.tasksReview}</div>
           </Link>
           <Link href="/content" className="bg-[#161b22] border border-[#30363d] rounded-lg p-4 hover:border-[#58a6ff]/50 transition-colors">
             <div className="flex items-center gap-2 mb-1">
@@ -101,7 +105,7 @@ export default function Dashboard() {
               </div>
               <ArrowRight className="w-4 h-4 text-[#6e7681] group-hover:text-[#f0883e] transition-colors" />
             </div>
-            <p className="text-sm text-[#8b949e]">Now / Next / Later board</p>
+            <p className="text-sm text-[#8b949e]">Kanban board</p>
           </Link>
           
           <Link href="/content" className="bg-[#161b22] border border-[#30363d] rounded-lg p-5 hover:border-[#58a6ff]/50 transition-colors group">
@@ -162,24 +166,66 @@ export default function Dashboard() {
           </Link>
         </div>
 
-        {/* Active Tasks */}
-        {tasksNow.length > 0 && (
+        {/* In Progress Tasks */}
+        {inProgressTasks.length > 0 && (
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-[#e6edf3]">Active Now</h2>
+              <h2 className="text-lg font-semibold text-[#e6edf3]">In Progress</h2>
               <Link href="/tasks" className="text-sm text-[#58a6ff] hover:underline">View all</Link>
             </div>
             <div className="space-y-2">
-              {tasksNow.map(task => (
-                <div key={task.slug} className="bg-[#161b22] border border-[#30363d] rounded-lg p-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-[#f0883e] rounded-full"></div>
-                    <span className="text-[#e6edf3]">{task.title}</span>
+              {inProgressTasks.map(task => (
+                <Link key={task.slug} href="/tasks" className="block bg-[#161b22] border border-[#30363d] rounded-lg p-4 hover:border-[#58a6ff]/50 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-[#58a6ff] rounded-full"></div>
+                      <span className="text-[#e6edf3]">{task.title}</span>
+                      {task.priority === 'now' && (
+                        <span className="text-xs px-1.5 py-0.5 rounded bg-[#f85149]/20 text-[#f85149]">Now</span>
+                      )}
+                    </div>
+                    <span className={`text-xs px-1.5 py-0.5 rounded ${
+                      task.assignee === 'molty' ? 'bg-[#58a6ff]/20 text-[#58a6ff]' : 'bg-[#a371f7]/20 text-[#a371f7]'
+                    }`}>
+                      {task.assignee === 'molty' ? '🦉 Molty' : '👤 Tom'}
+                    </span>
                   </div>
-                  {task.content && (
-                    <p className="text-sm text-[#8b949e] mt-1 ml-4">{task.content.substring(0, 100)}</p>
+                  {task.notes && (
+                    <p className="text-sm text-[#8b949e] mt-1 ml-4">{task.notes.substring(0, 100)}</p>
                   )}
-                </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Urgent Tasks (Now priority, not done) */}
+        {urgentTasks.length > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-[#e6edf3]">🔴 Priority: Now</h2>
+              <Link href="/tasks" className="text-sm text-[#58a6ff] hover:underline">View all</Link>
+            </div>
+            <div className="space-y-2">
+              {urgentTasks.map(task => (
+                <Link key={task.slug} href="/tasks" className="block bg-[#161b22] border border-[#30363d] rounded-lg p-4 hover:border-[#f85149]/50 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${
+                        task.status === 'todo' ? 'bg-[#8b949e]' :
+                        task.status === 'in-progress' ? 'bg-[#58a6ff]' :
+                        'bg-[#a371f7]'
+                      }`}></div>
+                      <span className="text-[#e6edf3]">{task.title}</span>
+                      <span className="text-xs text-[#6e7681]">({task.status})</span>
+                    </div>
+                    <span className={`text-xs px-1.5 py-0.5 rounded ${
+                      task.assignee === 'molty' ? 'bg-[#58a6ff]/20 text-[#58a6ff]' : 'bg-[#a371f7]/20 text-[#a371f7]'
+                    }`}>
+                      {task.assignee === 'molty' ? '🦉 Molty' : '👤 Tom'}
+                    </span>
+                  </div>
+                </Link>
               ))}
             </div>
           </div>

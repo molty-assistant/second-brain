@@ -8,7 +8,8 @@ const contentDirectory = path.join(process.cwd(), 'content');
 export interface Task {
   slug: string;
   title: string;
-  status: 'now' | 'next' | 'later' | 'done';
+  status: 'todo' | 'in-progress' | 'review' | 'done';
+  priority: 'now' | 'next' | 'later';
   assignee: 'tom' | 'molty';
   created: string;
   completed?: string;
@@ -41,11 +42,24 @@ export function getTasks(): Task[] {
     } else if (data.completed) {
       completedStr = String(data.completed);
     }
+
+    // Migration: old status values → new
+    let status = data.status || 'todo';
+    if (status === 'now' || status === 'next' || status === 'later') {
+      status = 'todo';
+    }
+    
+    // Priority: use old status if it was priority-based, otherwise default
+    let priority = data.priority || 'next';
+    if (data.status === 'now' || data.status === 'next' || data.status === 'later') {
+      priority = data.status;
+    }
     
     return {
       slug,
       title: data.title || slug,
-      status: data.status || 'later',
+      status: status as Task['status'],
+      priority: priority as Task['priority'],
       assignee: data.assignee || 'tom',
       created: createdStr,
       completed: completedStr,
@@ -55,7 +69,7 @@ export function getTasks(): Task[] {
   }).sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
 }
 
-export function getTasksByStatus(status: 'now' | 'next' | 'later' | 'done'): Task[] {
+export function getTasksByStatus(status: Task['status']): Task[] {
   return getTasks().filter(t => t.status === status);
 }
 
@@ -71,6 +85,7 @@ export function saveTask(task: Partial<Task> & { title: string; status: string }
   const frontmatter: Record<string, unknown> = {
     title: task.title,
     status: task.status,
+    priority: task.priority || 'next',
     assignee: task.assignee || 'tom',
     created: task.created || new Date().toISOString().split('T')[0],
   };
