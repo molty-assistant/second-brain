@@ -2,7 +2,11 @@ import path from 'path';
 import fs from 'fs';
 
 // Use a persistent location for the database (JSON file)
-const DATA_DIR = process.env.DATA_PATH || path.join(process.cwd(), 'data');
+// In production (Railway), use /app/data (mounted volume)
+// Locally, use ./data
+const DATA_DIR = process.env.NODE_ENV === 'production' 
+  ? '/app/data' 
+  : path.join(process.cwd(), 'data');
 const TASKS_FILE = path.join(DATA_DIR, 'tasks.json');
 const CONTENT_FILE = path.join(DATA_DIR, 'content.json');
 
