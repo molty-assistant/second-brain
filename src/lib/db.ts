@@ -10,17 +10,22 @@ const DATA_DIR = process.env.NODE_ENV === 'production'
 const TASKS_FILE = path.join(DATA_DIR, 'tasks.json');
 const CONTENT_FILE = path.join(DATA_DIR, 'content.json');
 
-// Ensure data directory exists
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-
-// Initialize files if they don't exist
-if (!fs.existsSync(TASKS_FILE)) {
-  fs.writeFileSync(TASKS_FILE, '[]');
-}
-if (!fs.existsSync(CONTENT_FILE)) {
-  fs.writeFileSync(CONTENT_FILE, '[]');
+// Ensure data directory and files exist (lazy initialization)
+function ensureDataDir() {
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    if (!fs.existsSync(TASKS_FILE)) {
+      fs.writeFileSync(TASKS_FILE, '[]');
+    }
+    if (!fs.existsSync(CONTENT_FILE)) {
+      fs.writeFileSync(CONTENT_FILE, '[]');
+    }
+  } catch (err) {
+    // Ignore errors during build time
+    console.warn('Could not initialize data directory:', err);
+  }
 }
 
 interface Task {
@@ -50,6 +55,7 @@ interface ContentItem {
 
 function readTasks(): Task[] {
   try {
+    ensureDataDir();
     return JSON.parse(fs.readFileSync(TASKS_FILE, 'utf-8'));
   } catch {
     return [];
@@ -57,11 +63,13 @@ function readTasks(): Task[] {
 }
 
 function writeTasks(tasks: Task[]) {
+  ensureDataDir();
   fs.writeFileSync(TASKS_FILE, JSON.stringify(tasks, null, 2));
 }
 
 function readContent(): ContentItem[] {
   try {
+    ensureDataDir();
     return JSON.parse(fs.readFileSync(CONTENT_FILE, 'utf-8'));
   } catch {
     return [];
@@ -69,6 +77,7 @@ function readContent(): ContentItem[] {
 }
 
 function writeContent(content: ContentItem[]) {
+  ensureDataDir();
   fs.writeFileSync(CONTENT_FILE, JSON.stringify(content, null, 2));
 }
 
