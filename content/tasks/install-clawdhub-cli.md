@@ -1,10 +1,11 @@
 ---
 title: "Install ClawdHub CLI for skill discovery"
-status: todo
+status: done
 priority: later
 assignee: tom
 created: '2026-02-01'
-notes: "Lower priority — useful for discovering new capabilities"
+completed: '2026-02-06'
+notes: "Installed and authenticated. Published moltbook-cli@1.1.0."
 ---
 
 ## Why This Matters

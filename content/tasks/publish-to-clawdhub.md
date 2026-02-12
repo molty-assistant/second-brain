@@ -1,10 +1,11 @@
 ---
 title: "Publish skills to ClawdHub"
-status: todo
+status: done
 priority: next
 assignee: molty
 created: '2026-02-03'
-notes: "Blocked until Feb 6 - GitHub account age requirement"
+completed: '2026-02-07'
+notes: "Published moltbook-cli@1.1.0 to ClawdHub on Feb 7"
 ---
 
 ## Skills Ready to Publish

@@ -1,10 +1,10 @@
 ---
 title: "Setup n8n for background automations"
 status: todo
-priority: next
+priority: later
 assignee: tom
 created: '2026-02-01'
-notes: "Medium priority — enables 24/7 automated workflows"
+notes: "Deprioritised — OpenClaw heartbeats + cron jobs cover most automation needs. Revisit if we need complex multi-step workflows."
 ---
 
 ## Why This Matters

@@ -1,10 +1,10 @@
 ---
-title: "Review 3 LinkedIn post drafts"
+title: "Review 4 LinkedIn post drafts"
 status: todo
 priority: next
 assignee: tom
 created: '2026-02-03'
-notes: "Molty drafted 3 posts - need Tom's review before publishing"
+notes: "4 drafts in projects/linkedin-drafts/ — agent economy, agent memory, AI tools honest take, shipping with full-time job. Been ready since Feb 3."
 ---
 
 ## Drafts Ready for Review

@@ -1,10 +1,11 @@
 ---
 title: "Setup Warp Agent Platform for Molty"
-status: todo
+status: done
 priority: now
 assignee: tom
 created: '2026-02-01'
-notes: "High priority — unlocks MCP integrations and ambient agents"
+completed: '2026-02-07'
+notes: "Warp CLI available at /Applications/Warp.app/Contents/Resources/bin/warp. Alias set in .zshrc."
 ---
 
 ## Why This Matters

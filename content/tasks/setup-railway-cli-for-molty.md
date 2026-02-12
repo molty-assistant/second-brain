@@ -1,10 +1,11 @@
 ---
 title: "Setup Railway CLI for Molty"
-status: todo
+status: done
 priority: now
 assignee: tom
 created: '2026-02-01'
-notes: "Highest priority — unlocks deployment capability"
+completed: '2026-02-12'
+notes: "Done! Railway CLI authenticated, marketing-tool deployed to https://marketing-tool-production.up.railway.app"
 ---
 
 ## Why This Matters

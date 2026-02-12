@@ -1,10 +1,10 @@
 ---
 title: "Setup Replit or Bolt for app building"
 status: todo
-priority: next
+priority: later
 assignee: tom
 created: '2026-02-01'
-notes: "Medium priority — lets me build web apps via browser automation"
+notes: "Deprioritised — I can build and deploy apps directly via code + Railway. Don't need a GUI builder."
 ---
 
 ## Why This Matters

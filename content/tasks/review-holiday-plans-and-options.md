@@ -1,12 +1,12 @@
 ---
 title: Review holiday plans and options
 status: in-progress
-priority: now
+priority: later
 assignee: molty
 created: '2026-02-01'
 notes: >-
-  Lots of docs and research created, we have to stick with available avios
-  flights
+  Research done, shortlist created, girlfriend-friendly page built. Parked until
+  Tom wants to revisit — focus has shifted to marketing company.
 ---
 Would be great if you review it all, maybe even put it together in a nicer view, make it easy for my girlfriend to review it
 
