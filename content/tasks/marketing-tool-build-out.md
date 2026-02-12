@@ -1,27 +1,30 @@
 ---
-title: "Build out Marketing Tool to v2.0"
+title: "Build Autonomous Marketing Company"
 status: in-progress
 priority: now
 assignee: molty
 created: '2026-02-12'
-notes: "Core product — full autonomous marketing engine"
+notes: "Core product — AI marketing agency with agent workforce"
 ---
+## Vision
+Molty operates as CEO of an autonomous marketing agency. First clients: our 5 apps. Future: SME clients.
 
-## What It Is
-Web app that generates complete marketing briefs from any app URL.
-**Live:** https://marketing-tool-production.up.railway.app
+## Agent Workforce
+| Role | Agent | Cost |
+|---|---|---|
+| CEO/Strategist | Opus (Molty) | $$$ |
+| Builder | Codex sub-agents | Included |
+| Copywriter | Gemini API | Free |
+| Researcher | Perplexity + Brave | ~$0.005/q |
+| QA/Proofreader | Local LLM (LM Studio) | Free |
 
-## Current State (v1.1) ✅
-- Scrapes App Store, Google Play, websites
-- 5-stage marketing brief generation (Vibe Marketing methodology)
-- SQLite persistence, editable config, basic auth
-- Visual asset templates (OG, social card, GitHub social)
-- Copy templates for Reddit, HN, Product Hunt, LinkedIn, Twitter
-
-## Next Steps (v1.5)
-- [ ] AI-generated copy via Gemini API (not just templates)
-- [ ] Auto-scrape competitors
-- [ ] SEO keyword research integration
-- [ ] PNG export for visual assets (Playwright)
-
-## Full roadmap in `projects/marketing-tool/ROADMAP.md`
+## Key Deliverables
+- [x] Perplexity research tool (`tools/perplexity-research.js`)
+- [x] Local LLM wrapper (`tools/local-llm.js`)
+- [x] Marketing tool v1 deployed to Railway
+- [x] Marketing briefs for all 5 apps
+- [ ] Integrate AI copy generation (Gemini) into marketing tool
+- [ ] Build workforce orchestration (`tools/workforce/`)
+- [ ] Add competitive intelligence via Perplexity
+- [ ] Full pipeline test: app → brief → copy → assets → distribution plan
+- [ ] Video generation (Veo 3.1 via Gemini)
