@@ -55,7 +55,7 @@ export default function Sidebar({ documents, journalEntries }: SidebarProps) {
   const filteredJournal = filterItems(journalEntries);
 
   return (
-    <aside className="w-64 h-screen bg-[#161b22] border-r border-[#30363d] flex flex-col fixed left-0 top-0">
+    <aside className="w-64 h-[calc(100vh-3.5rem)] bg-[#161b22] border-r border-[#30363d] flex flex-col fixed left-0 top-14">
       {/* Header */}
       <div className="p-4 border-b border-[#30363d]">
         <Link href="/" className="flex items-center gap-2 text-[#e6edf3] hover:text-white transition-colors">

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import QuickAdd from "@/components/QuickAdd";
+import ConvexClientProvider from "@/app/ConvexClientProvider";
+import TopNav from "@/components/TopNav";
 
 export const metadata: Metadata = {
   title: "Mission Control",
@@ -15,8 +17,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className="antialiased min-h-screen bg-[#0d1117]">
-        {children}
-        <QuickAdd />
+        <ConvexClientProvider>
+          <TopNav />
+          {children}
+          <QuickAdd />
+        </ConvexClientProvider>
       </body>
     </html>
   );
