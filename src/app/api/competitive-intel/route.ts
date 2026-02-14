@@ -1,9 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
-import intelData from '@/data/competitive-intel.json';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+
+function loadIntelData(): any {
+  // Avoid Turbopack JSON import issues on Railway builds by loading at runtime.
+  // If the file is missing in an environment, degrade gracefully.
+  try {
+    const p = path.join(process.cwd(), 'src', 'data', 'competitive-intel.json');
+    const raw = readFileSync(p, 'utf8');
+    return JSON.parse(raw);
+  } catch {
+    return { competitors: {}, keywords: {} };
+  }
+}
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const app = searchParams.get('app');
+
+  const intelData = loadIntelData();
 
   if (app) {
     const competitors = (intelData.competitors as Record<string, string>)[app] ?? null;

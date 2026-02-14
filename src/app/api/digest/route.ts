@@ -43,7 +43,19 @@ const APPS: Array<{ name: string; appId: string; slug: string }> = [
   { name: 'LightScout AI', appId: '6748341779', slug: 'lightscout' },
 ];
 
-import competitiveIntel from '@/data/competitive-intel.json';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+
+function loadCompetitiveIntel(): any {
+  try {
+    const p = path.join(process.cwd(), 'src', 'data', 'competitive-intel.json');
+    return JSON.parse(readFileSync(p, 'utf8'));
+  } catch {
+    return { competitors: {}, keywords: {} };
+  }
+}
+
+const competitiveIntel = loadCompetitiveIntel();
 
 let cachedDigest: { value: MarketingDigest; expiresAt: number } | null = null;
 
