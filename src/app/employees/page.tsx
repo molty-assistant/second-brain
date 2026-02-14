@@ -1,7 +1,7 @@
 import { getDocumentsByCategory } from '@/lib/documents';
 import Sidebar from '@/components/Sidebar';
-import ActivityClient from './ui/ActivityClient';
-import { Activity } from 'lucide-react';
+import EmployeesClient from './ui/EmployeesClient';
+import { Users } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,13 +10,13 @@ function SetupNotice() {
     <div className="bg-[#161b22] border border-[#30363d] rounded-lg p-6">
       <h2 className="text-lg font-semibold text-[#e6edf3] mb-2">Convex not configured</h2>
       <p className="text-sm text-[#8b949e]">
-        Set <code className="text-[#e6edf3]">NEXT_PUBLIC_CONVEX_URL</code> to enable Mission Control v2 pages.
+        Set <code className="text-[#e6edf3]">NEXT_PUBLIC_CONVEX_URL</code> to enable the employee dashboard.
       </p>
     </div>
   );
 }
 
-export default function ActivityPage() {
+export default function EmployeesPage() {
   const documents = getDocumentsByCategory('documents');
   const journalEntries = getDocumentsByCategory('journal');
   const hasConvex = !!process.env.NEXT_PUBLIC_CONVEX_URL;
@@ -25,18 +25,18 @@ export default function ActivityPage() {
     <div className="flex min-h-screen">
       <Sidebar documents={documents} journalEntries={journalEntries} />
       <main className="flex-1 ml-64">
-        <div className="max-w-5xl mx-auto px-8 py-12">
+        <div className="max-w-6xl mx-auto px-8 py-12">
           <div className="flex items-center gap-3 mb-8">
-            <div className="p-3 bg-[#58a6ff]/10 rounded-xl">
-              <Activity className="w-8 h-8 text-[#58a6ff]" />
+            <div className="p-3 bg-[#3fb950]/10 rounded-xl">
+              <Users className="w-8 h-8 text-[#3fb950]" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-[#e6edf3]">Activity Feed</h1>
-              <p className="text-[#8b949e]">Chronological log of work across agents</p>
+              <h1 className="text-3xl font-bold text-[#e6edf3]">Employees</h1>
+              <p className="text-[#8b949e]">Real-time agent status & output</p>
             </div>
           </div>
 
-          {hasConvex ? <ActivityClient /> : <SetupNotice />}
+          {hasConvex ? <EmployeesClient /> : <SetupNotice />}
         </div>
       </main>
     </div>

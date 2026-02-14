@@ -12,23 +12,19 @@ export const list = query({
   handler: async (ctx, args) => {
     const limit = args.limit ?? 100;
 
-    let q = ctx.db.query("scheduledTasks").withIndex("by_scheduled").order("asc");
+    const q = ctx.db
+      .query("scheduledTasks")
+      .withIndex("by_scheduled")
+      .order("asc");
 
     const results = await q.take(limit * 3);
 
     let filtered = results;
-    if (args.status) {
-      filtered = filtered.filter((t) => t.status === args.status);
-    }
-    if (args.assignedTo) {
+    if (args.status) filtered = filtered.filter((t) => t.status === args.status);
+    if (args.assignedTo)
       filtered = filtered.filter((t) => t.assignedTo === args.assignedTo);
-    }
-    if (args.fromMs) {
-      filtered = filtered.filter((t) => t.scheduledAt >= args.fromMs!);
-    }
-    if (args.toMs) {
-      filtered = filtered.filter((t) => t.scheduledAt <= args.toMs!);
-    }
+    if (args.fromMs) filtered = filtered.filter((t) => t.scheduledAt >= args.fromMs!);
+    if (args.toMs) filtered = filtered.filter((t) => t.scheduledAt <= args.toMs!);
 
     return filtered.slice(0, limit);
   },

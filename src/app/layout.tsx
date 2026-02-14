@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import QuickAdd from "@/components/QuickAdd";
-import ConvexClientProvider from "@/app/ConvexClientProvider";
+import ConvexClientProvider from "@/components/ConvexClientProvider";
 import TopNav from "@/components/TopNav";
 
 export const metadata: Metadata = {

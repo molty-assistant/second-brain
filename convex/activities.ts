@@ -11,24 +11,15 @@ export const list = query({
   },
   handler: async (ctx, args) => {
     const limit = args.limit ?? 50;
-    
-    let q = ctx.db.query("activities").withIndex("by_timestamp").order("desc");
 
+    const q = ctx.db.query("activities").withIndex("by_timestamp").order("desc");
     const results = await q.take(limit * 3); // over-fetch for client-side filtering
-    
+
     let filtered = results;
-    if (args.actor) {
-      filtered = filtered.filter((a) => a.actor === args.actor);
-    }
-    if (args.action) {
-      filtered = filtered.filter((a) => a.action === args.action);
-    }
-    if (args.afterMs) {
-      filtered = filtered.filter((a) => a.timestamp >= args.afterMs!);
-    }
-    if (args.beforeMs) {
-      filtered = filtered.filter((a) => a.timestamp <= args.beforeMs!);
-    }
+    if (args.actor) filtered = filtered.filter((a) => a.actor === args.actor);
+    if (args.action) filtered = filtered.filter((a) => a.action === args.action);
+    if (args.afterMs) filtered = filtered.filter((a) => a.timestamp >= args.afterMs!);
+    if (args.beforeMs) filtered = filtered.filter((a) => a.timestamp <= args.beforeMs!);
 
     return filtered.slice(0, limit);
   },

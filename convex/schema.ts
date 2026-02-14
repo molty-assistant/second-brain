@@ -4,8 +4,8 @@ import { v } from "convex/values";
 export default defineSchema({
   activities: defineTable({
     timestamp: v.number(), // Unix ms
-    actor: v.string(), // molty | tom | codex | ministral | perplexity | gemini
-    action: v.string(), // shipped | committed | deployed | researched | reviewed | delegated | posted | searched | fixed | planned
+    actor: v.string(), // Molty | Tom | Codex | Ministral | Perplexity | Gemini
+    action: v.string(), // shipped | committed | deployed | researched | reviewed | delegated | posted | searched | fixed | planned | ops
     title: v.string(),
     description: v.optional(v.string()),
     project: v.optional(v.string()),
@@ -39,5 +39,22 @@ export default defineSchema({
     .searchIndex("search_title", {
       searchField: "title",
       filterFields: ["status", "assignedTo", "project"],
+    }),
+
+  employees: defineTable({
+    name: v.string(),
+    role: v.string(),
+    model: v.string(),
+    status: v.string(), // idle | working | offline | error
+    currentTask: v.optional(v.string()),
+    lastActiveAt: v.optional(v.number()),
+    tasksCompleted: v.number(),
+    costType: v.string(), // free | subscription | per-token | per-query
+  })
+    .index("by_name", ["name"])
+    .index("by_status", ["status"])
+    .searchIndex("search_employee", {
+      searchField: "name",
+      filterFields: ["status", "role"],
     }),
 });

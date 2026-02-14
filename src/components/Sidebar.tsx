@@ -3,14 +3,16 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  FileText, 
-  Calendar, 
-  Search, 
-  ChevronDown, 
+import {
+  FileText,
+  Calendar,
+  Search,
+  ChevronDown,
   ChevronRight,
   Brain,
-  Hash
+  Hash,
+  Activity,
+  Users,
 } from 'lucide-react';
 
 interface DocumentMeta {
@@ -80,6 +82,59 @@ export default function Sidebar({ documents, journalEntries }: SidebarProps) {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto p-2">
+        {/* Mission Control */}
+        <div className="mb-4">
+          <div className="px-2 py-1.5 text-xs font-semibold text-[#6e7681] uppercase tracking-wide">
+            Mission Control
+          </div>
+          <div className="space-y-1">
+            <Link
+              href="/activity"
+              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
+                pathname === '/activity'
+                  ? 'bg-[#21262d] text-[#e6edf3]'
+                  : 'text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d]/50'
+              }`}
+            >
+              <Activity className="w-4 h-4" />
+              <span>Activity</span>
+            </Link>
+            <Link
+              href="/calendar"
+              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
+                pathname === '/calendar'
+                  ? 'bg-[#21262d] text-[#e6edf3]'
+                  : 'text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d]/50'
+              }`}
+            >
+              <Calendar className="w-4 h-4" />
+              <span>Calendar</span>
+            </Link>
+            <Link
+              href="/employees"
+              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
+                pathname === '/employees'
+                  ? 'bg-[#21262d] text-[#e6edf3]'
+                  : 'text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d]/50'
+              }`}
+            >
+              <Users className="w-4 h-4" />
+              <span>Employees</span>
+            </Link>
+            <Link
+              href="/search"
+              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
+                pathname === '/search'
+                  ? 'bg-[#21262d] text-[#e6edf3]'
+                  : 'text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d]/50'
+              }`}
+            >
+              <Search className="w-4 h-4" />
+              <span>Search</span>
+            </Link>
+          </div>
+        </div>
+
         {/* Documents Section */}
         <div className="mb-4">
           <button
