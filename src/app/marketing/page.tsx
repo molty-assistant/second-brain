@@ -124,6 +124,10 @@ export default function MarketingDashboard() {
           <p className="text-[#8b949e]">
             {Object.keys(APPS).length} apps · AI copy enhancement · Competitive intelligence · SEO keywords
           </p>
+          <div className="flex gap-3 mt-3">
+            <a href="/marketing/templates" className="text-sm px-3 py-1 rounded-lg bg-[#161b22] border border-[#30363d] text-[#58a6ff] hover:bg-[#1f2937] transition-colors">📝 Templates</a>
+            <a href="/marketing/reviews" className="text-sm px-3 py-1 rounded-lg bg-[#161b22] border border-[#30363d] text-[#58a6ff] hover:bg-[#1f2937] transition-colors">📊 Reviews</a>
+          </div>
         </div>
 
         {/* Search + Tone */}
