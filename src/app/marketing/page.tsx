@@ -127,6 +127,7 @@ export default function MarketingDashboard() {
           <div className="flex gap-3 mt-3">
             <a href="/marketing/templates" className="text-sm px-3 py-1 rounded-lg bg-[#161b22] border border-[#30363d] text-[#58a6ff] hover:bg-[#1f2937] transition-colors">📝 Templates</a>
             <a href="/marketing/reviews" className="text-sm px-3 py-1 rounded-lg bg-[#161b22] border border-[#30363d] text-[#58a6ff] hover:bg-[#1f2937] transition-colors">📊 Reviews</a>
+            <a href="/marketing/digest" className="text-sm px-3 py-1 rounded-lg bg-[#161b22] border border-[#30363d] text-[#58a6ff] hover:bg-[#1f2937] transition-colors">📋 Digest</a>
           </div>
         </div>
 
