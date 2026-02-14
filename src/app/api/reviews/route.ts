@@ -50,7 +50,8 @@ export async function GET(request: NextRequest) {
 
     const reviews: Review[] = entries
       .filter((e: Record<string, unknown>) => e['im:rating'])
-      .map((e: Record<string, Record<string, Record<string, string>>>) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((e: any) => {
         const rating = parseInt(e['im:rating'].label, 10);
         return {
           author: e.author?.name?.label ?? 'Unknown',
