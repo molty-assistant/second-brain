@@ -175,7 +175,7 @@ export default function Dashboard() {
             </div>
             <div className="space-y-2">
               {inProgressTasks.map(task => (
-                <Link key={task.slug} href="/tasks" className="block bg-[#161b22] border border-[#30363d] rounded-lg p-4 hover:border-[#58a6ff]/50 transition-colors">
+                <Link key={task.id} href="/tasks" className="block bg-[#161b22] border border-[#30363d] rounded-lg p-4 hover:border-[#58a6ff]/50 transition-colors">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-[#58a6ff] rounded-full"></div>
@@ -208,7 +208,7 @@ export default function Dashboard() {
             </div>
             <div className="space-y-2">
               {urgentTasks.map(task => (
-                <Link key={task.slug} href="/tasks" className="block bg-[#161b22] border border-[#30363d] rounded-lg p-4 hover:border-[#f85149]/50 transition-colors">
+                <Link key={task.id} href="/tasks" className="block bg-[#161b22] border border-[#30363d] rounded-lg p-4 hover:border-[#f85149]/50 transition-colors">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className={`w-2 h-2 rounded-full ${
