@@ -57,4 +57,25 @@ export default defineSchema({
       searchField: "name",
       filterFields: ["status", "role"],
     }),
+
+  backlogTasks: defineTable({
+    taskId: v.string(), // BL-001 etc
+    title: v.string(),
+    description: v.optional(v.string()),
+    assignedTo: v.string(),
+    status: v.string(), // todo | done | blocked
+    priority: v.optional(v.string()),
+    createdBy: v.optional(v.string()),
+    createdAt: v.optional(v.string()),
+    completedAt: v.optional(v.string()),
+    output: v.optional(v.string()),
+    pr: v.optional(v.string()),
+  })
+    .index("by_taskId", ["taskId"])
+    .index("by_status", ["status"])
+    .index("by_assignedTo", ["assignedTo"])
+    .searchIndex("search_title", {
+      searchField: "title",
+      filterFields: ["status", "assignedTo"],
+    }),
 });

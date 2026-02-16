@@ -10,7 +10,7 @@ export const globalSearch = queryGeneric({
     const q = args.q.trim();
     const limit = Math.min(args.limit ?? 10, 50);
     if (!q) {
-      return { activities: [], scheduledTasks: [], employees: [] };
+      return { activities: [], scheduledTasks: [], employees: [], backlogTasks: [] };
     }
 
     const activities = await ctx.db
@@ -28,6 +28,11 @@ export const globalSearch = queryGeneric({
       .withSearchIndex("search_employee", (s: any) => s.search("name", q))
       .take(limit);
 
-    return { activities, scheduledTasks, employees };
+    const backlogTasks = await ctx.db
+      .query("backlogTasks")
+      .withSearchIndex("search_title", (s: any) => s.search("title", q))
+      .take(limit);
+
+    return { activities, scheduledTasks, employees, backlogTasks };
   },
 });
