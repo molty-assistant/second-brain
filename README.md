@@ -98,6 +98,18 @@ src/
     └── documents.ts       # Document utilities
 ```
 
+## Scripts
+
+### Seed Activities
+
+Populate the activities table with realistic sample data (20 entries spanning 7 days):
+
+```bash
+CONVEX_URL=https://<your-deployment>.convex.cloud npx tsx scripts/seed-activities.ts
+```
+
+Set `CONVEX_URL` (or `NEXT_PUBLIC_CONVEX_URL`) to your Convex deployment URL. You can find it in the Convex dashboard or in `.env.local`.
+
 ## License
 
 MIT
