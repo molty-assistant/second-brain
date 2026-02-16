@@ -8,12 +8,13 @@ import { ChevronDown, ChevronRight } from 'lucide-react';
 type ActivityItem = {
   _id: string;
   timestamp: number;
-  agent: string;
+  actor: string;
   action: string;
-  summary: string;
-  detail?: string;
-  taskRef?: string;
-  status: string;
+  title: string;
+  description?: string;
+  project?: string;
+  tags?: string[];
+  metadata?: Record<string, unknown>;
 };
 
 function formatTs(ts: number) {
@@ -26,38 +27,24 @@ function formatTs(ts: number) {
   });
 }
 
-function StatusPill({ status }: { status: string }) {
-  const cls =
-    status === 'completed'
-      ? 'bg-[#3fb950]/20 text-[#3fb950] border-[#3fb950]/30'
-      : status === 'failed'
-        ? 'bg-[#f85149]/20 text-[#f85149] border-[#f85149]/30'
-        : 'bg-[#58a6ff]/20 text-[#58a6ff] border-[#58a6ff]/30';
-  return (
-    <span className={`text-xs px-2 py-0.5 rounded-full border ${cls}`}>{status}</span>
-  );
-}
-
 export default function ActivityClient() {
-  const [agent, setAgent] = useState<string>('');
+  const [actor, setActor] = useState<string>('');
   const [action, setAction] = useState<string>('');
-  const [status, setStatus] = useState<string>('');
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   const args = useMemo(
     () => ({
-      agent: agent || undefined,
+      actor: actor || undefined,
       action: action || undefined,
-      status: status || undefined,
       limit: 100,
     }),
-    [agent, action, status],
+    [actor, action],
   );
 
   const items = useQuery(convexApi.activities.list as any, args) as ActivityItem[] | undefined;
 
-  const agents = useMemo(() => {
-    const set = new Set((items ?? []).map((i) => i.agent));
+  const actors = useMemo(() => {
+    const set = new Set((items ?? []).map((i) => i.actor));
     return Array.from(set).sort();
   }, [items]);
 
@@ -70,12 +57,12 @@ export default function ActivityClient() {
     <div>
       <div className="flex flex-wrap gap-3 mb-4">
         <select
-          value={agent}
-          onChange={(e) => setAgent(e.target.value)}
+          value={actor}
+          onChange={(e) => setActor(e.target.value)}
           className="bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-sm text-[#e6edf3]"
         >
-          <option value="">All agents</option>
-          {agents.map((a) => (
+          <option value="">All actors</option>
+          {actors.map((a) => (
             <option key={a} value={a}>
               {a}
             </option>
@@ -93,17 +80,6 @@ export default function ActivityClient() {
               {a}
             </option>
           ))}
-        </select>
-
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className="bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-sm text-[#e6edf3]"
-        >
-          <option value="">Any status</option>
-          <option value="in-progress">in-progress</option>
-          <option value="completed">completed</option>
-          <option value="failed">failed</option>
         </select>
       </div>
 
@@ -123,27 +99,26 @@ export default function ActivityClient() {
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-sm text-[#6e7681]">{formatTs(it.timestamp)}</span>
                     <span className="text-xs px-2 py-0.5 rounded bg-[#58a6ff]/15 text-[#58a6ff]">
-                      {it.agent}
+                      {it.actor}
                     </span>
                     <span className="text-xs px-2 py-0.5 rounded bg-[#a371f7]/15 text-[#a371f7]">
                       {it.action}
                     </span>
-                    <StatusPill status={it.status} />
                   </div>
-                  <div className="text-[#e6edf3] mt-1">{it.summary}</div>
+                  <div className="text-[#e6edf3] mt-1">{it.title}</div>
                 </div>
               </button>
 
-              {isOpen && (it.detail || it.taskRef) && (
+              {isOpen && (it.description || it.project) && (
                 <div className="px-4 pb-4">
-                  {it.taskRef && (
+                  {it.project && (
                     <div className="text-sm text-[#8b949e] mb-2">
-                      <span className="text-[#6e7681]">Task:</span> {it.taskRef}
+                      <span className="text-[#6e7681]">Project:</span> {it.project}
                     </div>
                   )}
-                  {it.detail && (
+                  {it.description && (
                     <pre className="text-sm text-[#8b949e] whitespace-pre-wrap bg-[#0d1117] border border-[#30363d] rounded-md p-3 overflow-x-auto">
-                      {it.detail}
+                      {it.description}
                     </pre>
                   )}
                 </div>
