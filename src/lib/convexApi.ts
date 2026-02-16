@@ -5,7 +5,7 @@ import { makeFunctionReference } from "convex/server";
 export const convexApi = {
   activities: {
     list: makeFunctionReference("activities:list"),
-    logActivity: makeFunctionReference("activities:logActivity"),
+    log: makeFunctionReference("activities:log"),
   },
   scheduledTasks: {
     listBetween: makeFunctionReference("scheduledTasks:listBetween"),
