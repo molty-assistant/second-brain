@@ -6,7 +6,7 @@ import { Plus, X, Clock, User, Bot, AlertCircle, ChevronRight, Calendar, Trash2 
 import { useRouter } from 'next/navigation';
 
 interface Task {
-  slug: string;
+  id: string;
   title: string;
   status: 'todo' | 'in-progress' | 'review' | 'done';
   priority: 'now' | 'next' | 'later';
@@ -76,8 +76,8 @@ function TaskDetailPanel({
 }: { 
   task: Task; 
   onClose: () => void;
-  onUpdate: (slug: string, updates: Partial<Task>) => void;
-  onDelete: (slug: string) => void;
+  onUpdate: (id: string, updates: Partial<Task>) => void;
+  onDelete: (id: string) => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState(task);
@@ -85,7 +85,7 @@ function TaskDetailPanel({
   const [updateAuthor, setUpdateAuthor] = useState<'tom' | 'molty'>('tom');
 
   const handleSave = () => {
-    onUpdate(task.slug, editedTask);
+    onUpdate(task.id, editedTask);
     setIsEditing(false);
   };
 
@@ -102,7 +102,7 @@ function TaskDetailPanel({
     const updateLine = `\n\n---\n**${authorLabel}** (${timestamp}):\n${newUpdate.trim()}`;
     
     const updatedContent = (task.content || '') + updateLine;
-    onUpdate(task.slug, { content: updatedContent });
+    onUpdate(task.id, { content: updatedContent });
     setNewUpdate('');
   };
 
@@ -309,7 +309,7 @@ function TaskDetailPanel({
                 <button
                   onClick={() => {
                     if (confirm('Delete this task?')) {
-                      onDelete(task.slug);
+                      onDelete(task.id);
                       onClose();
                     }
                   }}
@@ -375,7 +375,7 @@ function TaskColumn({
       
       <div className="space-y-2">
         {tasks.map(task => (
-          <TaskCard key={task.slug} task={task} onClick={() => onTaskClick(task)} />
+          <TaskCard key={task.id} task={task} onClick={() => onTaskClick(task)} />
         ))}
         {tasks.length === 0 && (
           <div className="border border-dashed border-[#30363d] rounded-lg p-4 text-center">
@@ -406,14 +406,14 @@ export default function TaskBoard({ tasks }: TaskBoardProps) {
     router.refresh();
   };
   
-  const handleUpdate = async (slug: string, updates: Partial<Task>) => {
-    await updateTask(slug, updates);
+  const handleUpdate = async (id: string, updates: Partial<Task>) => {
+    await updateTask(id, updates);
     setSelectedTask(null);
     router.refresh();
   };
   
-  const handleDelete = async (slug: string) => {
-    await removeTask(slug);
+  const handleDelete = async (id: string) => {
+    await removeTask(id);
     router.refresh();
   };
 

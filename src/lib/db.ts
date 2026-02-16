@@ -1,5 +1,6 @@
 import path from 'path';
 import fs from 'fs';
+import matter from 'gray-matter';
 
 // Use a persistent location for the database (JSON file)
 // In production (Railway), use /app/data (mounted volume)
@@ -28,7 +29,7 @@ function ensureDataDir() {
   }
 }
 
-interface Task {
+export interface Task {
   id: string;
   title: string;
   status: string;
@@ -41,7 +42,7 @@ interface Task {
   updated: string;
 }
 
-interface ContentItem {
+export interface ContentItem {
   id: string;
   title: string;
   type: string;
@@ -53,10 +54,106 @@ interface ContentItem {
   updated: string;
 }
 
+function toIsoStringFromDateLike(date: unknown, fallback: Date): string {
+  try {
+    if (date instanceof Date) return date.toISOString();
+    if (typeof date === 'string' && date.trim()) {
+      // Supports YYYY-MM-DD or ISO strings
+      const d = new Date(date);
+      if (!Number.isNaN(d.getTime())) return d.toISOString();
+    }
+  } catch {
+    // ignore
+  }
+  return fallback.toISOString();
+}
+
+function normalizeTitle(title: string) {
+  return title.trim().toLowerCase();
+}
+
+function migrateMarkdownTasksToJson(existingTasks: Task[]): { tasks: Task[]; changed: boolean } {
+  // Read legacy tasks from content/tasks/*.md and append into JSON if missing (by title)
+  // Keeps markdown files, but makes JSON the single source of truth.
+  try {
+    const tasksDir = path.join(process.cwd(), 'content', 'tasks');
+    if (!fs.existsSync(tasksDir)) return { tasks: existingTasks, changed: false };
+
+    const byTitle = new Map(existingTasks.map(t => [normalizeTitle(t.title), t] as const));
+
+    const files = fs.readdirSync(tasksDir).filter(f => f.endsWith('.md'));
+    if (files.length === 0) return { tasks: existingTasks, changed: false };
+
+    const now = new Date();
+    let changed = false;
+
+    for (const file of files) {
+      const filePath = path.join(tasksDir, file);
+      const raw = fs.readFileSync(filePath, 'utf8');
+      const { data, content } = matter(raw);
+      const stat = fs.statSync(filePath);
+
+      const title = String((data as Record<string, unknown>).title || file.replace(/\.md$/, '').replace(/-/g, ' '));
+      const titleKey = normalizeTitle(title);
+      if (byTitle.has(titleKey)) continue;
+
+      // Migration: old status values → new
+      let status = String((data as Record<string, unknown>).status || 'todo');
+      if (status === 'now' || status === 'next' || status === 'later') status = 'todo';
+
+      // Priority: use old status if it was priority-based, otherwise default
+      let priority = String((data as Record<string, unknown>).priority || 'next');
+      const oldStatus = (data as Record<string, unknown>).status;
+      if (oldStatus === 'now' || oldStatus === 'next' || oldStatus === 'later') {
+        priority = String(oldStatus);
+      }
+
+      const assignee = String((data as Record<string, unknown>).assignee || 'tom');
+      const notesVal = (data as Record<string, unknown>).notes;
+      const notes = notesVal == null ? null : String(notesVal);
+
+      const created = toIsoStringFromDateLike((data as Record<string, unknown>).created, stat.mtime);
+      const completedRaw = (data as Record<string, unknown>).completed;
+      const completed = completedRaw ? toIsoStringFromDateLike(completedRaw, now) : null;
+
+      const migrated: Task = {
+        id: crypto.randomUUID(),
+        title,
+        status,
+        priority,
+        assignee,
+        notes,
+        content: content?.trim() ? content.trim() : null,
+        created,
+        completed,
+        updated: now.toISOString(),
+      };
+
+      existingTasks.push(migrated);
+      byTitle.set(titleKey, migrated);
+      changed = true;
+    }
+
+    if (changed) {
+      // Newest first, like createTask()
+      existingTasks.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
+    }
+
+    return { tasks: existingTasks, changed };
+  } catch (err) {
+    // Safe to ignore (build-time, missing FS permissions, etc.)
+    console.warn('Task markdown→JSON migration skipped:', err);
+    return { tasks: existingTasks, changed: false };
+  }
+}
+
 function readTasks(): Task[] {
   try {
     ensureDataDir();
-    return JSON.parse(fs.readFileSync(TASKS_FILE, 'utf-8'));
+    const existing: Task[] = JSON.parse(fs.readFileSync(TASKS_FILE, 'utf-8'));
+    const { tasks, changed } = migrateMarkdownTasksToJson(existing);
+    if (changed) writeTasks(tasks);
+    return tasks;
   } catch {
     return [];
   }
@@ -124,9 +221,9 @@ export function updateTask(id: string, updates: Partial<{
   status: string;
   priority: string;
   assignee: string;
-  notes: string;
-  content: string;
-  completed: string;
+  notes: string | null;
+  content: string | null;
+  completed: string | null;
 }>) {
   const tasks = readTasks();
   const index = tasks.findIndex(t => t.id === id);

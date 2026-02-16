@@ -3,9 +3,9 @@ import path from 'path';
 import matter from 'gray-matter';
 import { remark } from 'remark';
 import html from 'remark-html';
+import { getAllTasks } from '@/lib/db';
 
 const contentDirectory = path.join(process.cwd(), 'content');
-const dataDirectory = path.join(process.cwd(), 'data');
 
 // Helper to ensure date is string
 function ensureDateString(date: unknown, fallback: Date): string {
@@ -16,7 +16,7 @@ function ensureDateString(date: unknown, fallback: Date): string {
 
 // ============ TASKS ============
 export interface Task {
-  slug: string;
+  id: string;
   title: string;
   status: 'todo' | 'in-progress' | 'review' | 'done';
   priority: 'now' | 'next' | 'later';
@@ -28,67 +28,20 @@ export interface Task {
 }
 
 export function getTasks(): Task[] {
-  const tasks: Task[] = [];
-  
-  // 1. Read from JSON file (API-created tasks)
-  const jsonFile = path.join(dataDirectory, 'tasks.json');
-  if (fs.existsSync(jsonFile)) {
-    try {
-      const jsonTasks = JSON.parse(fs.readFileSync(jsonFile, 'utf8'));
-      for (const t of jsonTasks) {
-        tasks.push({
-          slug: t.id,
-          title: t.title,
-          status: t.status as Task['status'],
-          priority: t.priority as Task['priority'],
-          assignee: t.assignee as Task['assignee'],
-          created: t.created?.split('T')[0] || new Date().toISOString().split('T')[0],
-          completed: t.completed?.split('T')[0],
-          notes: t.notes,
-          content: t.content,
-        });
-      }
-    } catch {
-      // Ignore JSON parse errors
-    }
-  }
-  
-  // 2. Read from markdown files (legacy tasks)
-  const dir = path.join(contentDirectory, 'tasks');
-  if (fs.existsSync(dir)) {
-    for (const file of fs.readdirSync(dir).filter(f => f.endsWith('.md'))) {
-      const filePath = path.join(dir, file);
-      const fileContents = fs.readFileSync(filePath, 'utf8');
-      const { data, content } = matter(fileContents);
-      const stat = fs.statSync(filePath);
-      
-      // Migration: old status values → new
-      let status = data.status || 'todo';
-      if (status === 'now' || status === 'next' || status === 'later') {
-        status = 'todo'; // Old priority-based statuses become todo
-      }
-      
-      // Priority: use old status if it was priority-based, otherwise default
-      let priority = data.priority || 'next';
-      if (data.status === 'now' || data.status === 'next' || data.status === 'later') {
-        priority = data.status;
-      }
-      
-      tasks.push({
-        slug: file.replace(/\.md$/, ''),
-        title: data.title || file.replace(/\.md$/, '').replace(/-/g, ' '),
-        status: status as Task['status'],
-        priority: priority as Task['priority'],
-        assignee: data.assignee || 'tom',
-        created: ensureDateString(data.created, stat.mtime),
-        completed: data.completed ? ensureDateString(data.completed, new Date()) : undefined,
-        notes: data.notes,
-        content: content.trim(),
-      });
-    }
-  }
-  
-  return tasks.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
+  const tasks = getAllTasks();
+  return tasks
+    .map(t => ({
+      id: t.id,
+      title: t.title,
+      status: t.status as Task['status'],
+      priority: t.priority as Task['priority'],
+      assignee: t.assignee as Task['assignee'],
+      created: t.created?.split('T')[0] || new Date().toISOString().split('T')[0],
+      completed: t.completed?.split('T')[0] || undefined,
+      notes: t.notes || undefined,
+      content: t.content || undefined,
+    }))
+    .sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
 }
 
 export function getTasksByStatus(status: Task['status']): Task[] {
