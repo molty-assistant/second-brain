@@ -14,6 +14,7 @@ const links: Array<{ href: string; label: string }> = [
   // New pages
   { href: '/activity', label: 'Activity Feed' },
   { href: '/calendar', label: 'Calendar' },
+  { href: '/work-orders', label: 'Work Orders' },
   { href: '/search', label: 'Search' },
 ];
 

@@ -123,15 +123,15 @@ export default function Sidebar({ documents, journalEntries }: SidebarProps) {
               <span>Employees</span>
             </Link>
             <Link
-              href="/backlog"
+              href="/work-orders"
               className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
-                pathname === '/backlog'
+                pathname === '/work-orders'
                   ? 'bg-[#21262d] text-[#e6edf3]'
                   : 'text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d]/50'
               }`}
             >
               <ClipboardList className="w-4 h-4" />
-              <span>Backlog</span>
+              <span>Work Orders</span>
             </Link>
             <Link
               href="/search"

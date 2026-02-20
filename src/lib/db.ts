@@ -35,6 +35,7 @@ export interface Task {
   status: string;
   priority: string;
   assignee: string;
+  workOrderId: string | null;
   notes: string | null;
   content: string | null;
   created: string;
@@ -122,6 +123,7 @@ function migrateMarkdownTasksToJson(existingTasks: Task[]): { tasks: Task[]; cha
         status,
         priority,
         assignee,
+        workOrderId: null,
         notes,
         content: content?.trim() ? content.trim() : null,
         created,
@@ -150,7 +152,13 @@ function migrateMarkdownTasksToJson(existingTasks: Task[]): { tasks: Task[]; cha
 function readTasks(): Task[] {
   try {
     ensureDataDir();
-    const existing: Task[] = JSON.parse(fs.readFileSync(TASKS_FILE, 'utf-8'));
+    const existing = (JSON.parse(fs.readFileSync(TASKS_FILE, 'utf-8')) as Partial<Task>[]).map((task) => ({
+      ...task,
+      workOrderId:
+        typeof task.workOrderId === 'string' && task.workOrderId.trim()
+          ? task.workOrderId.trim()
+          : null,
+    })) as Task[];
     const { tasks, changed } = migrateMarkdownTasksToJson(existing);
     if (changed) writeTasks(tasks);
     return tasks;
@@ -194,6 +202,7 @@ export function createTask(task: {
   status?: string;
   priority?: string;
   assignee?: string;
+  workOrderId?: string;
   notes?: string;
   content?: string;
 }) {
@@ -205,6 +214,7 @@ export function createTask(task: {
     status: task.status || 'todo',
     priority: task.priority || 'next',
     assignee: task.assignee || 'molty',
+    workOrderId: task.workOrderId || null,
     notes: task.notes || null,
     content: task.content || null,
     created: now,
@@ -221,6 +231,7 @@ export function updateTask(id: string, updates: Partial<{
   status: string;
   priority: string;
   assignee: string;
+  workOrderId: string | null;
   notes: string | null;
   content: string | null;
   completed: string | null;

@@ -19,6 +19,12 @@ export const convexApi = {
     seed: makeFunctionReference("employees:seed"),
     updateStatus: makeFunctionReference("employees:updateStatus"),
   },
+  workOrders: {
+    list: makeFunctionReference("workOrders:list"),
+    get: makeFunctionReference("workOrders:get"),
+    create: makeFunctionReference("workOrders:create"),
+    update: makeFunctionReference("workOrders:update"),
+  },
   search: {
     globalSearch: makeFunctionReference("search:globalSearch"),
   },

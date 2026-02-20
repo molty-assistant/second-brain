@@ -11,6 +11,7 @@ interface Task {
   status: 'todo' | 'in-progress' | 'review' | 'done';
   priority: 'now' | 'next' | 'later';
   assignee: 'tom' | 'molty';
+  workOrderId?: string;
   created: string;
   completed?: string;
   notes?: string;
@@ -188,6 +189,29 @@ function TaskDetailPanel({
               </select>
             ) : (
               <AssigneeBadge assignee={task.assignee} />
+            )}
+          </div>
+
+          {/* Work Order Link */}
+          <div>
+            <label className="block text-xs font-medium text-[#8b949e] uppercase tracking-wide mb-2">Work Order ID</label>
+            {isEditing ? (
+              <input
+                type="text"
+                value={editedTask.workOrderId || ''}
+                onChange={e => setEditedTask({ ...editedTask, workOrderId: e.target.value })}
+                placeholder="WO-..."
+                className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-[#e6edf3] placeholder-[#6e7681] focus:outline-none focus:border-[#58a6ff]"
+              />
+            ) : task.workOrderId ? (
+              <div className="flex items-center gap-3">
+                <code className="text-sm px-2 py-1 rounded bg-[#0d1117] border border-[#30363d] text-[#e6edf3]">{task.workOrderId}</code>
+                <a href="/work-orders" className="text-sm text-[#58a6ff] hover:underline">
+                  Open Work Orders
+                </a>
+              </div>
+            ) : (
+              <span className="text-[#6e7681] italic">No linked work order</span>
             )}
           </div>
 

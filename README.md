@@ -110,6 +110,22 @@ CONVEX_URL=https://<your-deployment>.convex.cloud npx tsx scripts/seed-activitie
 
 Set `CONVEX_URL` (or `NEXT_PUBLIC_CONVEX_URL`) to your Convex deployment URL. You can find it in the Convex dashboard or in `.env.local`.
 
+### Create Work Order (CLI)
+
+Create a Work Order directly in Mission Control (Convex), then write a local audit snapshot:
+
+```bash
+node tools/workforce/create-workorder.js \
+  --title "Implement unified Work Orders page" \
+  --priority now \
+  --status todo \
+  --worker codex \
+  --acceptance "Page exists|Filters work|Create modal works"
+```
+
+`CONVEX_URL` (or `NEXT_PUBLIC_CONVEX_URL`) is required.  
+Mission Control (Convex) is the source of truth; `tools/workforce/workorders/*.md` are snapshots for audit/history only.
+
 ## License
 
 MIT

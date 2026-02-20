@@ -21,6 +21,7 @@ export interface Task {
   status: 'todo' | 'in-progress' | 'review' | 'done';
   priority: 'now' | 'next' | 'later';
   assignee: 'tom' | 'molty';
+  workOrderId?: string;
   created: string;
   completed?: string;
   notes?: string;
@@ -36,6 +37,7 @@ export function getTasks(): Task[] {
       status: t.status as Task['status'],
       priority: t.priority as Task['priority'],
       assignee: t.assignee as Task['assignee'],
+      workOrderId: t.workOrderId || undefined,
       created: t.created?.split('T')[0] || new Date().toISOString().split('T')[0],
       completed: t.completed?.split('T')[0] || undefined,
       notes: t.notes || undefined,
