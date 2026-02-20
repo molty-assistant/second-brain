@@ -36,6 +36,7 @@ export default defineSchema({
     .index("by_scheduled", ["scheduledAt"])
     .index("by_status", ["status", "scheduledAt"])
     .index("by_assigned", ["assignedTo", "scheduledAt"])
+    .index("by_cronJobId", ["cronJobId"])
     .searchIndex("search_title", {
       searchField: "title",
       filterFields: ["status", "assignedTo", "project"],
@@ -57,4 +58,34 @@ export default defineSchema({
       searchField: "name",
       filterFields: ["status", "role"],
     }),
+
+  workOrders: defineTable({
+    id: v.string(),
+    title: v.string(),
+    priority: v.union(v.literal("now"), v.literal("next"), v.literal("later")),
+    status: v.union(
+      v.literal("todo"),
+      v.literal("in_progress"),
+      v.literal("review"),
+      v.literal("done"),
+      v.literal("blocked")
+    ),
+    worker: v.union(
+      v.literal("codex"),
+      v.literal("claude"),
+      v.literal("lmstudio"),
+      v.literal("molty")
+    ),
+    repo: v.optional(v.string()),
+    acceptance: v.array(v.string()),
+    constraints: v.array(v.string()),
+    links: v.optional(v.array(v.string())),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_id", ["id"])
+    .index("by_createdAt", ["createdAt"])
+    .index("by_status", ["status", "createdAt"])
+    .index("by_priority", ["priority", "createdAt"])
+    .index("by_worker", ["worker", "createdAt"]),
 });

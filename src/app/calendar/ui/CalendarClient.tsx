@@ -15,17 +15,19 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 type ScheduledTask = {
   _id: string;
-  name: string;
+  title: string;
   scheduledAt: number;
-  agent: string;
-  description: string;
+  assignedTo: string;
+  description?: string;
   status: string;
   recurrence?: string;
 };
 
 const agentColors: Record<string, string> = {
   molty: 'border-[#58a6ff]/40 bg-[#58a6ff]/10 text-[#58a6ff]',
+  tom: 'border-[#a371f7]/40 bg-[#a371f7]/10 text-[#a371f7]',
   codex: 'border-[#f0883e]/40 bg-[#f0883e]/10 text-[#f0883e]',
+  claude: 'border-[#f0883e]/40 bg-[#f0883e]/10 text-[#f0883e]',
   ministral: 'border-[#a371f7]/40 bg-[#a371f7]/10 text-[#a371f7]',
   perplexity: 'border-[#3fb950]/40 bg-[#3fb950]/10 text-[#3fb950]',
   gemini: 'border-[#d2a8ff]/40 bg-[#d2a8ff]/10 text-[#d2a8ff]',
@@ -103,14 +105,14 @@ export default function CalendarClient() {
                 {dayTasks.map((t) => (
                   <div
                     key={t._id}
-                    className={`border rounded-md px-2 py-1.5 ${colorForAgent(t.agent)}`}
+                    className={`border rounded-md px-2 py-1.5 ${colorForAgent(t.assignedTo)}`}
                     title={t.description}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <div className="text-xs font-medium truncate">{t.name}</div>
+                      <div className="text-xs font-medium truncate">{t.title}</div>
                       <div className="text-[10px] opacity-80">{format(new Date(t.scheduledAt), 'HH:mm')}</div>
                     </div>
-                    <div className="text-[10px] opacity-80 truncate">{t.agent} • {t.status}</div>
+                    <div className="text-[10px] opacity-80 truncate">{t.assignedTo} • {t.status}</div>
                   </div>
                 ))}
 

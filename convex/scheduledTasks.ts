@@ -1,7 +1,62 @@
-import { query, mutation } from "./_generated/server";
+import { mutationGeneric, queryGeneric } from "convex/server";
 import { v } from "convex/values";
 
-export const list = query({
+// NOTE: This module is consumed by the Mission Control calendar UI.
+// Keep function names aligned with src/lib/convexApi.ts.
+
+export const listBetween = queryGeneric({
+  args: {
+    start: v.number(),
+    end: v.number(),
+    limit: v.optional(v.number()),
+    status: v.optional(v.string()),
+    assignedTo: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const limit = Math.min(args.limit ?? 500, 2000);
+
+    // Convex doesn't support "between" range queries on this index directly,
+    // so we over-fetch and filter in memory.
+    const rows = await ctx.db
+      .query("scheduledTasks")
+      .withIndex("by_scheduled")
+      .order("asc")
+      .take(limit * 3);
+
+    let filtered = rows.filter((t: any) => t.scheduledAt >= args.start && t.scheduledAt <= args.end);
+    if (args.status) filtered = filtered.filter((t: any) => t.status === args.status);
+    if (args.assignedTo) filtered = filtered.filter((t: any) => t.assignedTo === args.assignedTo);
+
+    return filtered.slice(0, limit);
+  },
+});
+
+export const listUpcoming = queryGeneric({
+  args: {
+    from: v.optional(v.number()),
+    limit: v.optional(v.number()),
+    status: v.optional(v.string()),
+    assignedTo: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const from = args.from ?? Date.now();
+    const limit = Math.min(args.limit ?? 200, 1000);
+
+    const rows = await ctx.db
+      .query("scheduledTasks")
+      .withIndex("by_scheduled")
+      .order("asc")
+      .take(limit * 3);
+
+    let filtered = rows.filter((t: any) => t.scheduledAt >= from);
+    if (args.status) filtered = filtered.filter((t: any) => t.status === args.status);
+    if (args.assignedTo) filtered = filtered.filter((t: any) => t.assignedTo === args.assignedTo);
+
+    return filtered.slice(0, limit);
+  },
+});
+
+export const list = queryGeneric({
   args: {
     status: v.optional(v.string()),
     assignedTo: v.optional(v.string()),
@@ -10,28 +65,29 @@ export const list = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const limit = args.limit ?? 100;
+    const limit = Math.min(args.limit ?? 200, 1000);
 
-    const q = ctx.db
+    const rows = await ctx.db
       .query("scheduledTasks")
       .withIndex("by_scheduled")
-      .order("asc");
+      .order("asc")
+      .take(limit * 3);
 
-    const results = await q.take(limit * 3);
-
-    let filtered = results;
-    if (args.status) filtered = filtered.filter((t) => t.status === args.status);
-    if (args.assignedTo)
-      filtered = filtered.filter((t) => t.assignedTo === args.assignedTo);
-    if (args.fromMs) filtered = filtered.filter((t) => t.scheduledAt >= args.fromMs!);
-    if (args.toMs) filtered = filtered.filter((t) => t.scheduledAt <= args.toMs!);
+    let filtered = rows;
+    if (args.status) filtered = filtered.filter((t: any) => t.status === args.status);
+    if (args.assignedTo) filtered = filtered.filter((t: any) => t.assignedTo === args.assignedTo);
+    if (args.fromMs) filtered = filtered.filter((t: any) => t.scheduledAt >= args.fromMs!);
+    if (args.toMs) filtered = filtered.filter((t: any) => t.scheduledAt <= args.toMs!);
 
     return filtered.slice(0, limit);
   },
 });
 
-export const create = mutation({
+export const upsert = mutationGeneric({
   args: {
+    // Natural key for scheduled tasks coming from OpenClaw crons.
+    cronJobId: v.string(),
+
     title: v.string(),
     description: v.optional(v.string()),
     scheduledAt: v.number(),
@@ -41,11 +97,32 @@ export const create = mutation({
     assignedTo: v.string(),
     project: v.optional(v.string()),
     source: v.string(),
-    cronJobId: v.optional(v.string()),
     metadata: v.optional(v.any()),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.insert("scheduledTasks", {
+    const existing = await ctx.db
+      .query("scheduledTasks")
+      .withIndex("by_cronJobId", (q) => q.eq("cronJobId", args.cronJobId))
+      .first();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        title: args.title,
+        description: args.description,
+        scheduledAt: args.scheduledAt,
+        endAt: args.endAt,
+        recurrence: args.recurrence,
+        status: args.status ?? existing.status,
+        assignedTo: args.assignedTo,
+        project: args.project,
+        source: args.source,
+        cronJobId: args.cronJobId,
+        metadata: args.metadata,
+      });
+      return await ctx.db.get(existing._id);
+    }
+
+    const id = await ctx.db.insert("scheduledTasks", {
       title: args.title,
       description: args.description,
       scheduledAt: args.scheduledAt,
@@ -58,37 +135,7 @@ export const create = mutation({
       cronJobId: args.cronJobId,
       metadata: args.metadata,
     });
-  },
-});
 
-export const update = mutation({
-  args: {
-    id: v.id("scheduledTasks"),
-    status: v.optional(v.string()),
-    title: v.optional(v.string()),
-    description: v.optional(v.string()),
-    scheduledAt: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const { id, ...fields } = args;
-    const patch: Record<string, unknown> = {};
-    for (const [k, val] of Object.entries(fields)) {
-      if (val !== undefined) patch[k] = val;
-    }
-    await ctx.db.patch(id, patch);
-  },
-});
-
-export const search = query({
-  args: {
-    query: v.string(),
-    limit: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const results = await ctx.db
-      .query("scheduledTasks")
-      .withSearchIndex("search_title", (q) => q.search("title", args.query))
-      .take(args.limit ?? 20);
-    return results;
+    return await ctx.db.get(id);
   },
 });
