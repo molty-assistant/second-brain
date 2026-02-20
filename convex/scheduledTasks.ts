@@ -1,6 +1,24 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
+export const listBetween = query({
+  args: {
+    start: v.number(),
+    end: v.number(),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const limit = args.limit ?? 500;
+    return await ctx.db
+      .query('scheduledTasks')
+      .withIndex('by_scheduled', (q) =>
+        q.gte('scheduledAt', args.start).lte('scheduledAt', args.end)
+      )
+      .order('asc')
+      .take(limit);
+  },
+});
+
 export const list = query({
   args: {
     status: v.optional(v.string()),

@@ -1,7 +1,7 @@
-import { mutationGeneric, queryGeneric } from "convex/server";
+import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
-export const list = queryGeneric({
+export const list = query({
   args: {},
   handler: async (ctx) => {
     const items = await ctx.db.query("employees").withIndex("by_name").collect();
@@ -9,7 +9,7 @@ export const list = queryGeneric({
   },
 });
 
-export const seed = mutationGeneric({
+export const seed = mutation({
   args: {},
   handler: async (ctx) => {
     const existing = await ctx.db.query("employees").take(1);
@@ -77,24 +77,23 @@ export const seed = mutationGeneric({
   },
 });
 
-export const updateStatus = mutationGeneric({
+export const updateStatus = mutation({
   args: {
-    id: v.string(),
+    id: v.id("employees"),
     status: v.string(),
     currentTask: v.optional(v.string()),
     lastActiveAt: v.optional(v.number()),
     tasksCompletedDelta: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const doc: any = await ctx.db.get(args.id as any);
+    const doc = await ctx.db.get(args.id);
     if (!doc) throw new Error("Employee not found");
 
-    await ctx.db.patch(args.id as any, {
+    await ctx.db.patch(args.id, {
       status: args.status,
       currentTask: args.currentTask,
       lastActiveAt: args.lastActiveAt ?? Date.now(),
-      tasksCompleted:
-        doc.tasksCompleted + (args.tasksCompletedDelta ?? 0),
+      tasksCompleted: doc.tasksCompleted + (args.tasksCompletedDelta ?? 0),
     });
     return true;
   },
