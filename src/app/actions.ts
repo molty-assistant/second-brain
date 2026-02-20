@@ -63,7 +63,10 @@ export async function createPipelineItem(formData: FormData) {
   return { success: true };
 }
 
-export async function updatePipelineStatus(slug: string, newStatus: string) {
+export async function updatePipelineStatus(
+  slug: string,
+  newStatus: 'idea' | 'ideas' | 'drafting' | 'review' | 'published'
+) {
   const { getPipelineItems, savePipelineItem } = await import('@/lib/content');
   const items = getPipelineItems();
   const item = items.find(i => i.slug === slug);
