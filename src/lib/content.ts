@@ -115,7 +115,11 @@ export interface PipelineItem {
   slug: string;
   title: string;
   type: 'post' | 'article' | 'talk';
-  status: 'ideas' | 'drafting' | 'review' | 'published';
+  /**
+   * Content pipeline status.
+   * Note: older files may contain `ideas` (plural) — we normalize to `idea`.
+   */
+  status: 'idea' | 'drafting' | 'review' | 'published';
   created: string;
   notes?: string;
   content?: string;
@@ -140,11 +144,14 @@ export function getPipelineItems(): PipelineItem[] {
       createdStr = data.created || fs.statSync(filePath).mtime.toISOString().split('T')[0];
     }
     
+    const rawStatus = String(data.status || 'idea');
+    const normalizedStatus = rawStatus === 'ideas' ? 'idea' : rawStatus;
+
     return {
       slug,
       title: data.title || slug,
       type: data.type || 'post',
-      status: data.status || 'ideas',
+      status: (normalizedStatus || 'idea') as PipelineItem['status'],
       created: createdStr,
       notes: data.notes,
       content: content.trim(),

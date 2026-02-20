@@ -15,10 +15,10 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 type ScheduledTask = {
   _id: string;
-  name: string;
+  title: string;
   scheduledAt: number;
-  agent: string;
-  description: string;
+  assignedTo: string;
+  description?: string;
   status: string;
   recurrence?: string;
 };
@@ -93,9 +93,10 @@ export default function CalendarClient() {
             .filter((t) => isSameDay(new Date(t.scheduledAt), day))
             .sort((a, b) => a.scheduledAt - b.scheduledAt);
 
+          const today = isSameDay(day, new Date());
           return (
-            <div key={day.toISOString()} className="bg-[#161b22] border border-[#30363d] rounded-lg overflow-hidden">
-              <div className="px-3 py-2 border-b border-[#30363d]">
+            <div key={day.toISOString()} className={`bg-[#161b22] border rounded-lg overflow-hidden ${today ? 'border-[#58a6ff]/60' : 'border-[#30363d]'}`}>
+              <div className={`px-3 py-2 border-b ${today ? 'border-[#58a6ff]/40 bg-[#58a6ff]/5' : 'border-[#30363d]'}`}>
                 <div className="text-xs text-[#6e7681]">{format(day, 'EEE')}</div>
                 <div className="text-sm font-medium text-[#e6edf3]">{format(day, 'dd MMM')}</div>
               </div>
@@ -103,14 +104,14 @@ export default function CalendarClient() {
                 {dayTasks.map((t) => (
                   <div
                     key={t._id}
-                    className={`border rounded-md px-2 py-1.5 ${colorForAgent(t.agent)}`}
+                    className={`border rounded-md px-2 py-1.5 ${colorForAgent(t.assignedTo)}`}
                     title={t.description}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <div className="text-xs font-medium truncate">{t.name}</div>
+                      <div className="text-xs font-medium truncate">{t.title}</div>
                       <div className="text-[10px] opacity-80">{format(new Date(t.scheduledAt), 'HH:mm')}</div>
                     </div>
-                    <div className="text-[10px] opacity-80 truncate">{t.agent} • {t.status}</div>
+                    <div className="text-[10px] opacity-80 truncate">{t.assignedTo} • {t.status}</div>
                   </div>
                 ))}
 

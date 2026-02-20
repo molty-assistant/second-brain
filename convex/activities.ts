@@ -6,6 +6,8 @@ export const list = query({
     limit: v.optional(v.number()),
     actor: v.optional(v.string()),
     action: v.optional(v.string()),
+    status: v.optional(v.string()),
+    project: v.optional(v.string()),
     afterMs: v.optional(v.number()),
     beforeMs: v.optional(v.number()),
   },
@@ -18,6 +20,8 @@ export const list = query({
     let filtered = results;
     if (args.actor) filtered = filtered.filter((a) => a.actor === args.actor);
     if (args.action) filtered = filtered.filter((a) => a.action === args.action);
+    if (args.status) filtered = filtered.filter((a) => a.status === args.status);
+    if (args.project) filtered = filtered.filter((a) => a.project === args.project);
     if (args.afterMs) filtered = filtered.filter((a) => a.timestamp >= args.afterMs!);
     if (args.beforeMs) filtered = filtered.filter((a) => a.timestamp <= args.beforeMs!);
 
@@ -32,6 +36,8 @@ export const log = mutation({
     action: v.string(),
     title: v.string(),
     description: v.optional(v.string()),
+    status: v.optional(v.string()),
+    taskRef: v.optional(v.string()),
     project: v.optional(v.string()),
     tags: v.optional(v.array(v.string())),
     metadata: v.optional(v.any()),
@@ -43,6 +49,8 @@ export const log = mutation({
       action: args.action,
       title: args.title,
       description: args.description,
+      status: (args as any).status,
+      taskRef: (args as any).taskRef,
       project: args.project,
       tags: args.tags,
       metadata: args.metadata,
@@ -59,6 +67,8 @@ export const logBatch = mutation({
         action: v.string(),
         title: v.string(),
         description: v.optional(v.string()),
+        status: v.optional(v.string()),
+        taskRef: v.optional(v.string()),
         project: v.optional(v.string()),
         tags: v.optional(v.array(v.string())),
         metadata: v.optional(v.any()),
@@ -74,6 +84,8 @@ export const logBatch = mutation({
         action: activity.action,
         title: activity.title,
         description: activity.description,
+        status: (activity as any).status,
+        taskRef: (activity as any).taskRef,
         project: activity.project,
         tags: activity.tags,
         metadata: activity.metadata,

@@ -7,18 +7,18 @@ import { convexApi } from '@/lib/convexApi';
 type ActivityItem = {
   _id: string;
   timestamp: number;
-  agent: string;
+  actor: string;
   action: string;
-  summary: string;
-  status: string;
+  title: string;
+  status?: string;
 };
 
 type ScheduledTask = {
   _id: string;
-  name: string;
+  title: string;
   scheduledAt: number;
-  agent: string;
-  description: string;
+  assignedTo: string;
+  description?: string;
   status: string;
 };
 
@@ -68,7 +68,7 @@ export default function SearchClient() {
           className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-3 text-[#e6edf3] placeholder-[#6e7681] focus:outline-none focus:border-[#f0883e] focus:ring-1 focus:ring-[#f0883e]"
         />
         <div className="text-xs text-[#6e7681] mt-2">
-          Tip: try agent names, task names, or activity summaries.
+          Tip: try actor names, task titles, or activity titles.
         </div>
       </div>
 
@@ -83,11 +83,11 @@ export default function SearchClient() {
                 <div key={a._id} className="bg-[#161b22] border border-[#30363d] rounded-lg p-4">
                   <div className="flex flex-wrap gap-2 text-xs text-[#8b949e]">
                     <span>{new Date(a.timestamp).toLocaleString('en-GB')}</span>
-                    <span className="px-2 py-0.5 rounded bg-[#58a6ff]/15 text-[#58a6ff]">{a.agent}</span>
+                    <span className="px-2 py-0.5 rounded bg-[#58a6ff]/15 text-[#58a6ff]">{a.actor}</span>
                     <span className="px-2 py-0.5 rounded bg-[#a371f7]/15 text-[#a371f7]">{a.action}</span>
-                    <span className="px-2 py-0.5 rounded border border-[#30363d]">{a.status}</span>
+                    <span className="px-2 py-0.5 rounded border border-[#30363d]">{a.status || 'completed'}</span>
                   </div>
-                  <div className="text-[#e6edf3] mt-2">{highlight(a.summary, q)}</div>
+                  <div className="text-[#e6edf3] mt-2">{highlight(a.title, q)}</div>
                 </div>
               ))}
               {res.activities.length === 0 && <div className="text-xs text-[#6e7681]">No matches.</div>}
@@ -101,11 +101,13 @@ export default function SearchClient() {
                 <div key={t._id} className="bg-[#161b22] border border-[#30363d] rounded-lg p-4">
                   <div className="flex flex-wrap gap-2 text-xs text-[#8b949e]">
                     <span>{new Date(t.scheduledAt).toLocaleString('en-GB')}</span>
-                    <span className="px-2 py-0.5 rounded bg-[#58a6ff]/15 text-[#58a6ff]">{t.agent}</span>
+                    <span className="px-2 py-0.5 rounded bg-[#58a6ff]/15 text-[#58a6ff]">{t.assignedTo}</span>
                     <span className="px-2 py-0.5 rounded border border-[#30363d]">{t.status}</span>
                   </div>
-                  <div className="text-[#e6edf3] mt-2">{highlight(t.name, q)}</div>
-                  <div className="text-sm text-[#8b949e] mt-1">{highlight(t.description, q)}</div>
+                  <div className="text-[#e6edf3] mt-2">{highlight(t.title, q)}</div>
+                  {t.description && (
+                    <div className="text-sm text-[#8b949e] mt-1">{highlight(t.description, q)}</div>
+                  )}
                 </div>
               ))}
               {res.scheduledTasks.length === 0 && <div className="text-xs text-[#6e7681]">No matches.</div>}

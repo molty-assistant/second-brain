@@ -8,6 +8,8 @@ export default defineSchema({
     action: v.string(), // shipped | committed | deployed | researched | reviewed | delegated | posted | searched | fixed | planned | ops
     title: v.string(),
     description: v.optional(v.string()),
+    status: v.optional(v.string()), // completed | failed | in-progress
+    taskRef: v.optional(v.string()),
     project: v.optional(v.string()),
     tags: v.optional(v.array(v.string())),
     metadata: v.optional(v.any()),

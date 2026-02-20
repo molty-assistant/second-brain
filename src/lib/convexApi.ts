@@ -6,11 +6,13 @@ export const convexApi = {
   activities: {
     list: makeFunctionReference("activities:list"),
     log: makeFunctionReference("activities:log"),
+    logBatch: makeFunctionReference("activities:logBatch"),
   },
   scheduledTasks: {
+    list: makeFunctionReference("scheduledTasks:list"),
     listBetween: makeFunctionReference("scheduledTasks:listBetween"),
-    listUpcoming: makeFunctionReference("scheduledTasks:listUpcoming"),
-    upsert: makeFunctionReference("scheduledTasks:upsert"),
+    create: makeFunctionReference("scheduledTasks:create"),
+    update: makeFunctionReference("scheduledTasks:update"),
   },
   employees: {
     list: makeFunctionReference("employees:list"),

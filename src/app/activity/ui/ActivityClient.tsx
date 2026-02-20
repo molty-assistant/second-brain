@@ -12,9 +12,9 @@ type ActivityItem = {
   action: string;
   title: string;
   description?: string;
+  taskRef?: string;
+  status?: string;
   project?: string;
-  tags?: string[];
-  metadata?: Record<string, unknown>;
 };
 
 function formatTs(ts: number) {
@@ -27,18 +27,32 @@ function formatTs(ts: number) {
   });
 }
 
+function StatusPill({ status }: { status: string }) {
+  const cls =
+    status === 'completed'
+      ? 'bg-[#3fb950]/20 text-[#3fb950] border-[#3fb950]/30'
+      : status === 'failed'
+        ? 'bg-[#f85149]/20 text-[#f85149] border-[#f85149]/30'
+        : 'bg-[#58a6ff]/20 text-[#58a6ff] border-[#58a6ff]/30';
+  return (
+    <span className={`text-xs px-2 py-0.5 rounded-full border ${cls}`}>{status}</span>
+  );
+}
+
 export default function ActivityClient() {
   const [actor, setActor] = useState<string>('');
   const [action, setAction] = useState<string>('');
+  const [status, setStatus] = useState<string>('');
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   const args = useMemo(
     () => ({
       actor: actor || undefined,
       action: action || undefined,
+      status: status || undefined,
       limit: 100,
     }),
-    [actor, action],
+    [actor, action, status],
   );
 
   const items = useQuery(convexApi.activities.list as any, args) as ActivityItem[] | undefined;
@@ -81,6 +95,17 @@ export default function ActivityClient() {
             </option>
           ))}
         </select>
+
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          className="bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-sm text-[#e6edf3]"
+        >
+          <option value="">Any status</option>
+          <option value="in-progress">in-progress</option>
+          <option value="completed">completed</option>
+          <option value="failed">failed</option>
+        </select>
       </div>
 
       <div className="space-y-2">
@@ -104,16 +129,17 @@ export default function ActivityClient() {
                     <span className="text-xs px-2 py-0.5 rounded bg-[#a371f7]/15 text-[#a371f7]">
                       {it.action}
                     </span>
+                    <StatusPill status={it.status || 'completed'} />
                   </div>
                   <div className="text-[#e6edf3] mt-1">{it.title}</div>
                 </div>
               </button>
 
-              {isOpen && (it.description || it.project) && (
+              {isOpen && (it.description || it.taskRef) && (
                 <div className="px-4 pb-4">
-                  {it.project && (
+                  {it.taskRef && (
                     <div className="text-sm text-[#8b949e] mb-2">
-                      <span className="text-[#6e7681]">Project:</span> {it.project}
+                      <span className="text-[#6e7681]">Task:</span> {it.taskRef}
                     </div>
                   )}
                   {it.description && (

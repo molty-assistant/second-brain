@@ -1,7 +1,7 @@
-import { queryGeneric } from "convex/server";
+import { query } from "./_generated/server";
 import { v } from "convex/values";
 
-export const globalSearch = queryGeneric({
+export const globalSearch = query({
   args: {
     q: v.string(),
     limit: v.optional(v.number()),
@@ -15,12 +15,12 @@ export const globalSearch = queryGeneric({
 
     const activities = await ctx.db
       .query("activities")
-      .withSearchIndex("search_summary_detail", (s: any) => s.search("summary", q))
+      .withSearchIndex("search_title", (s) => s.search("title", q))
       .take(limit);
 
     const scheduledTasks = await ctx.db
       .query("scheduledTasks")
-      .withSearchIndex("search_name_description", (s: any) => s.search("name", q))
+      .withSearchIndex("search_title", (s) => s.search("title", q))
       .take(limit);
 
     const employees = await ctx.db
