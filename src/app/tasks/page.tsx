@@ -25,6 +25,7 @@ export default function TasksPage() {
             <div>
               <h1 className="text-3xl font-bold text-[#e6edf3]">Tasks</h1>
               <p className="text-[#8b949e]">To Do → In Progress → Review → Done</p>
+              <p className="text-xs text-[#6e7681] mt-1">Shortcuts: <kbd className="px-1.5 py-0.5 border border-[#30363d] rounded bg-[#0d1117]">N</kbd> new task, <kbd className="px-1.5 py-0.5 border border-[#30363d] rounded bg-[#0d1117]">Esc</kbd> close</p>
             </div>
           </div>
 
