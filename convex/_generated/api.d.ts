@@ -11,6 +11,7 @@
 import type * as activities from "../activities.js";
 import type * as backlog from "../backlog.js";
 import type * as employees from "../employees.js";
+import type * as http from "../http.js";
 import type * as scheduledTasks from "../scheduledTasks.js";
 import type * as search from "../search.js";
 
@@ -24,6 +25,7 @@ declare const fullApi: ApiFromModules<{
   activities: typeof activities;
   backlog: typeof backlog;
   employees: typeof employees;
+  http: typeof http;
   scheduledTasks: typeof scheduledTasks;
   search: typeof search;
 }>;
