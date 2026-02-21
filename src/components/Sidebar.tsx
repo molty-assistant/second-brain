@@ -14,6 +14,7 @@ import {
   Activity,
   Users,
   ClipboardList,
+  FileClock,
 } from 'lucide-react';
 
 interface DocumentMeta {
@@ -121,6 +122,17 @@ export default function Sidebar({ documents, journalEntries }: SidebarProps) {
             >
               <Users className="w-4 h-4" />
               <span>Employees</span>
+            </Link>
+            <Link
+              href="/reports"
+              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
+                pathname?.startsWith('/reports')
+                  ? 'bg-[#21262d] text-[#e6edf3]'
+                  : 'text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d]/50'
+              }`}
+            >
+              <FileClock className="w-4 h-4" />
+              <span>Reports</span>
             </Link>
             <Link
               href="/work-orders"
