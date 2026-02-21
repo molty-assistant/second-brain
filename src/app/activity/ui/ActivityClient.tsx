@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useQuery } from 'convex/react';
 import { convexApi } from '@/lib/convexApi';
 import { ChevronDown, ChevronRight } from 'lucide-react';
@@ -40,10 +41,39 @@ function StatusPill({ status }: { status: string }) {
 }
 
 export default function ActivityClient() {
-  const [actor, setActor] = useState<string>('');
-  const [action, setAction] = useState<string>('');
-  const [status, setStatus] = useState<string>('');
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [actor, setActor] = useState<string>(searchParams.get('actor') ?? '');
+  const [action, setAction] = useState<string>(searchParams.get('action') ?? '');
+  const [status, setStatus] = useState<string>(searchParams.get('status') ?? '');
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+
+  // Keep state in sync when navigating back/forward.
+  useEffect(() => {
+    setActor(searchParams.get('actor') ?? '');
+    setAction(searchParams.get('action') ?? '');
+    setStatus(searchParams.get('status') ?? '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  // Persist filters to URL for shareable links.
+  useEffect(() => {
+    const next = new URLSearchParams(searchParams.toString());
+
+    const setOrDelete = (key: string, value: string) => {
+      if (value) next.set(key, value);
+      else next.delete(key);
+    };
+
+    setOrDelete('actor', actor);
+    setOrDelete('action', action);
+    setOrDelete('status', status);
+
+    // Replace (not push) to avoid polluting history on every change.
+    router.replace(`?${next.toString()}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [actor, action, status]);
 
   const args = useMemo(
     () => ({
