@@ -13,7 +13,7 @@ function getConvexUrl(): string | null {
   return process.env.CONVEX_URL || process.env.NEXT_PUBLIC_CONVEX_URL || null;
 }
 
-async function postConvexMutation(path: string, args: any) {
+async function postConvexMutation(path: string, args: unknown) {
   const convexUrl = getConvexUrl();
   if (!convexUrl) return null;
 

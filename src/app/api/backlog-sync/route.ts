@@ -49,7 +49,7 @@ export async function POST() {
     }));
 
     const client = new ConvexHttpClient(convexUrl);
-    const res = await client.mutation(api.backlog.sync as any, { tasks });
+    const res = await client.mutation(api.backlog.sync, { tasks });
 
     return NextResponse.json({ success: true, synced: tasks.length, ...res });
   } catch (error) {

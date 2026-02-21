@@ -46,10 +46,15 @@ const APPS: Array<{ name: string; appId: string; slug: string }> = [
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
-function loadCompetitiveIntel(): any {
+function loadCompetitiveIntel(): { competitors: Record<string, string>; keywords: Record<string, string> } {
   try {
     const p = path.join(process.cwd(), 'src', 'data', 'competitive-intel.json');
-    return JSON.parse(readFileSync(p, 'utf8'));
+    const parsed = JSON.parse(readFileSync(p, 'utf8')) as unknown;
+    const data = parsed as Partial<{ competitors: Record<string, string>; keywords: Record<string, string> }>;
+    return {
+      competitors: data.competitors ?? {},
+      keywords: data.keywords ?? {},
+    };
   } catch {
     return { competitors: {}, keywords: {} };
   }
@@ -119,7 +124,7 @@ export async function GET(request: NextRequest) {
   }
 
   const origin = request.nextUrl.origin;
-  const keywordsBySlug = (competitiveIntel as { keywords?: Record<string, string> })?.keywords ?? {};
+  const keywordsBySlug = competitiveIntel.keywords ?? {};
 
   const apps: DigestApp[] = [];
 

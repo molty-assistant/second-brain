@@ -82,7 +82,7 @@ export default function BacklogClient() {
     return { status: tab };
   }, [tab]);
 
-  const tasks = useQuery(api.backlog.list as any, queryArgs) as BacklogTask[] | undefined;
+  const tasks = useQuery(api.backlog.list, queryArgs) as BacklogTask[] | undefined;
 
   const sorted = useMemo(() => {
     const list = [...(tasks ?? [])];
