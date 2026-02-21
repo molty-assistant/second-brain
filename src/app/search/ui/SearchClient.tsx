@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from 'convex/react';
 import { convexApi } from '@/lib/convexApi';
 
@@ -54,6 +54,11 @@ function highlight(text: string, q: string): React.ReactNode {
 
 export default function SearchClient() {
   const [q, setQ] = useState('');
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   const args = useMemo(() => ({ q, limit: 10 }), [q]);
   const res = useQuery(convexApi.search.globalSearch, args) as SearchResults | undefined;
@@ -61,12 +66,27 @@ export default function SearchClient() {
   return (
     <div>
       <div className="mb-6">
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Search…"
-          className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-3 text-[#e6edf3] placeholder-[#6e7681] focus:outline-none focus:border-[#f0883e] focus:ring-1 focus:ring-[#f0883e]"
-        />
+        <div className="flex gap-2">
+          <input
+            ref={inputRef}
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search…"
+            className="flex-1 bg-[#0d1117] border border-[#30363d] rounded-md px-4 py-3 text-[#e6edf3] placeholder-[#6e7681] focus:outline-none focus:border-[#f0883e] focus:ring-1 focus:ring-[#f0883e]"
+          />
+          {q.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                setQ('');
+                inputRef.current?.focus();
+              }}
+              className="px-4 py-3 rounded-md border border-[#30363d] bg-[#0d1117] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#f0883e]/40"
+            >
+              Clear
+            </button>
+          )}
+        </div>
         <div className="text-xs text-[#6e7681] mt-2">
           Tip: try actor names, task titles, or activity titles.
         </div>
@@ -74,7 +94,11 @@ export default function SearchClient() {
 
       {!res && <div className="text-sm text-[#6e7681]">Type to search…</div>}
 
-      {res && (
+      {res && q.trim().length === 0 && (
+        <div className="text-sm text-[#6e7681]">Type to search…</div>
+      )}
+
+      {res && q.trim().length > 0 && (
         <div className="space-y-6">
           <section>
             <h2 className="text-sm font-semibold text-[#e6edf3] mb-2">Activities</h2>
