@@ -5,7 +5,7 @@ export const list = query({
   args: {},
   handler: async (ctx) => {
     const items = await ctx.db.query("employees").withIndex("by_name").collect();
-    return items.sort((a: any, b: any) => a.name.localeCompare(b.name));
+    return items.sort((a, b) => a.name.localeCompare(b.name));
   },
 });
 

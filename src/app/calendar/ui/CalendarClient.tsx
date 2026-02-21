@@ -48,7 +48,7 @@ export default function CalendarClient() {
   );
   const weekEnd = useMemo(() => endOfWeek(weekStart, { weekStartsOn: 1 }), [weekStart]);
 
-  const tasks = useQuery(convexApi.scheduledTasks.listBetween as any, {
+  const tasks = useQuery(convexApi.scheduledTasks.listBetween, {
     start: weekStart.getTime(),
     end: weekEnd.getTime(),
     limit: 500,

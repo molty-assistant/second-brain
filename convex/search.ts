@@ -25,12 +25,12 @@ export const globalSearch = query({
 
     const employees = await ctx.db
       .query("employees")
-      .withSearchIndex("search_employee", (s: any) => s.search("name", q))
+      .withSearchIndex("search_employee", (s) => s.search("name", q))
       .take(limit);
 
     const backlogTasks = await ctx.db
       .query("backlogTasks")
-      .withSearchIndex("search_title", (s: any) => s.search("title", q))
+      .withSearchIndex("search_title", (s) => s.search("title", q))
       .take(limit);
 
     return { activities, scheduledTasks, employees, backlogTasks };

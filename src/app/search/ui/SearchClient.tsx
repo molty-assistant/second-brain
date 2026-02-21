@@ -36,7 +36,7 @@ type SearchResults = {
   employees: Employee[];
 };
 
-function highlight(text: string, q: string) {
+function highlight(text: string, q: string): React.ReactNode {
   if (!q) return text;
   const idx = text.toLowerCase().indexOf(q.toLowerCase());
   if (idx === -1) return text;
@@ -56,7 +56,7 @@ export default function SearchClient() {
   const [q, setQ] = useState('');
 
   const args = useMemo(() => ({ q, limit: 10 }), [q]);
-  const res = useQuery(convexApi.search.globalSearch as any, args) as SearchResults | undefined;
+  const res = useQuery(convexApi.search.globalSearch, args) as SearchResults | undefined;
 
   return (
     <div>
@@ -119,8 +119,8 @@ export default function SearchClient() {
             <div className="grid md:grid-cols-2 gap-3">
               {res.employees.map((e) => (
                 <div key={e._id} className="bg-[#161b22] border border-[#30363d] rounded-lg p-4">
-                  <div className="text-[#e6edf3] font-medium">{highlight(e.name, q) as any}</div>
-                  <div className="text-sm text-[#8b949e]">{highlight(e.role, q) as any}</div>
+                  <div className="text-[#e6edf3] font-medium">{highlight(e.name, q)}</div>
+                  <div className="text-sm text-[#8b949e]">{highlight(e.role, q)}</div>
                   <div className="text-xs text-[#6e7681] mt-2">{e.model} • {e.status}</div>
                 </div>
               ))}

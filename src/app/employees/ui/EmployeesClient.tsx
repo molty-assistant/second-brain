@@ -40,8 +40,8 @@ function statusDot(status: string) {
 
 export default function EmployeesClient() {
   const [seeded, setSeeded] = useState(false);
-  const seed = useMutation(convexApi.employees.seed as any);
-  const employees = useQuery(convexApi.employees.list as any, {}) as Employee[] | undefined;
+  const seed = useMutation(convexApi.employees.seed);
+  const employees = useQuery(convexApi.employees.list, {}) as Employee[] | undefined;
 
   useEffect(() => {
     if (seeded) return;

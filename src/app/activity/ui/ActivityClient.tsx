@@ -55,7 +55,7 @@ export default function ActivityClient() {
     [actor, action, status],
   );
 
-  const items = useQuery(convexApi.activities.list as any, args) as ActivityItem[] | undefined;
+  const items = useQuery(convexApi.activities.list, args) as ActivityItem[] | undefined;
 
   const actors = useMemo(() => {
     const set = new Set((items ?? []).map((i) => i.actor));
