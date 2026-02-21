@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useQuery } from 'convex/react';
 import { convexApi } from '@/lib/convexApi';
@@ -44,36 +44,18 @@ export default function ActivityClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [actor, setActor] = useState<string>(searchParams.get('actor') ?? '');
-  const [action, setAction] = useState<string>(searchParams.get('action') ?? '');
-  const [status, setStatus] = useState<string>(searchParams.get('status') ?? '');
+  const actor = searchParams.get('actor') ?? '';
+  const action = searchParams.get('action') ?? '';
+  const status = searchParams.get('status') ?? '';
+
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
-  // Keep state in sync when navigating back/forward.
-  useEffect(() => {
-    setActor(searchParams.get('actor') ?? '');
-    setAction(searchParams.get('action') ?? '');
-    setStatus(searchParams.get('status') ?? '');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
-
-  // Persist filters to URL for shareable links.
-  useEffect(() => {
+  const updateFilter = (key: 'actor' | 'action' | 'status', value: string) => {
     const next = new URLSearchParams(searchParams.toString());
-
-    const setOrDelete = (key: string, value: string) => {
-      if (value) next.set(key, value);
-      else next.delete(key);
-    };
-
-    setOrDelete('actor', actor);
-    setOrDelete('action', action);
-    setOrDelete('status', status);
-
-    // Replace (not push) to avoid polluting history on every change.
+    if (value) next.set(key, value);
+    else next.delete(key);
     router.replace(`?${next.toString()}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actor, action, status]);
+  };
 
   const args = useMemo(
     () => ({
@@ -102,7 +84,7 @@ export default function ActivityClient() {
       <div className="flex flex-wrap gap-3 mb-4">
         <select
           value={actor}
-          onChange={(e) => setActor(e.target.value)}
+          onChange={(e) => updateFilter('actor', e.target.value)}
           className="bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-sm text-[#e6edf3]"
         >
           <option value="">All actors</option>
@@ -115,7 +97,7 @@ export default function ActivityClient() {
 
         <select
           value={action}
-          onChange={(e) => setAction(e.target.value)}
+          onChange={(e) => updateFilter('action', e.target.value)}
           className="bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-sm text-[#e6edf3]"
         >
           <option value="">All actions</option>
@@ -128,7 +110,7 @@ export default function ActivityClient() {
 
         <select
           value={status}
-          onChange={(e) => setStatus(e.target.value)}
+          onChange={(e) => updateFilter('status', e.target.value)}
           className="bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-sm text-[#e6edf3]"
         >
           <option value="">Any status</option>
