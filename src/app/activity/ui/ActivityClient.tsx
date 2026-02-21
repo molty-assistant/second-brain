@@ -57,6 +57,12 @@ export default function ActivityClient() {
     router.replace(`?${next.toString()}`);
   };
 
+  const clearFilters = () => {
+    router.replace('?');
+  };
+
+  const hasFilters = Boolean(actor || action || status);
+
   const args = useMemo(
     () => ({
       actor: actor || undefined,
@@ -81,7 +87,7 @@ export default function ActivityClient() {
 
   return (
     <div>
-      <div className="flex flex-wrap gap-3 mb-4">
+      <div className="flex flex-wrap gap-3 mb-4 items-center">
         <select
           value={actor}
           onChange={(e) => updateFilter('actor', e.target.value)}
@@ -118,6 +124,16 @@ export default function ActivityClient() {
           <option value="completed">completed</option>
           <option value="failed">failed</option>
         </select>
+
+        {hasFilters && (
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="text-sm px-3 py-2 rounded-md border border-[#30363d] bg-[#0d1117] text-[#8b949e] hover:text-[#e6edf3] hover:border-[#58a6ff]/40"
+          >
+            Clear
+          </button>
+        )}
       </div>
 
       <div className="space-y-2">
