@@ -58,6 +58,24 @@ export default function SearchClient() {
 
   useEffect(() => {
     inputRef.current?.focus();
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      // / focuses search (unless already typing)
+      const target = e.target as HTMLElement | null;
+      const isTyping =
+        !!target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          (target as HTMLElement).isContentEditable);
+
+      if (!isTyping && e.key === '/') {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
 
   const args = useMemo(() => ({ q, limit: 10 }), [q]);
@@ -88,7 +106,7 @@ export default function SearchClient() {
           )}
         </div>
         <div className="text-xs text-[#6e7681] mt-2">
-          Tip: try actor names, task titles, or activity titles.
+          Tip: try actor names, task titles, or activity titles. Press <kbd className="px-1.5 py-0.5 border border-[#30363d] rounded bg-[#0d1117]">/</kbd> to focus search.
         </div>
       </div>
 
