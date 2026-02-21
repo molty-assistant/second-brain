@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createTask, updateTask, removeTask } from '@/app/actions';
 import { Plus, X, Clock, User, Bot, AlertCircle, ChevronRight, Calendar, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -240,9 +240,15 @@ function TaskDetailPanel({
               <textarea
                 value={newUpdate}
                 onChange={e => setNewUpdate(e.target.value)}
+                onKeyDown={(e) => {
+                  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAddUpdate();
+                  }
+                }}
                 rows={2}
                 className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-[#e6edf3] placeholder-[#6e7681] focus:outline-none focus:border-[#58a6ff] resize-none text-sm mb-2"
-                placeholder="Add a note, handoff context, or update..."
+                placeholder="Add a note, handoff context, or update... (Ctrl/⌘ + Enter to add)"
               />
               <div className="flex items-center gap-2">
                 <select
@@ -392,6 +398,41 @@ export default function TaskBoard({ tasks }: TaskBoardProps) {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const isTyping =
+        !!target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          (target as HTMLElement).isContentEditable);
+
+      // ESC: close panels/forms
+      if (e.key === 'Escape') {
+        if (selectedTask) {
+          e.preventDefault();
+          setSelectedTask(null);
+          return;
+        }
+        if (showForm) {
+          e.preventDefault();
+          setShowForm(false);
+          return;
+        }
+      }
+
+      // N: open new task (when not typing)
+      if (!isTyping && (e.key === 'n' || e.key === 'N')) {
+        e.preventDefault();
+        setSelectedTask(null);
+        setShowForm(true);
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [selectedTask, showForm]);
   
   const todoTasks = tasks.filter(t => t.status === 'todo');
   const inProgressTasks = tasks.filter(t => t.status === 'in-progress');
