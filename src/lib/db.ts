@@ -302,5 +302,3 @@ export function updateContent(id: string, updates: Partial<{
   return content[index];
 }
 
-// No default export needed
-export default {};

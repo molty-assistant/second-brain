@@ -1,7 +1,6 @@
 import { getProjects } from '@/lib/hub';
 import { getDocumentsByCategory } from '@/lib/documents';
 import Sidebar from '@/components/Sidebar';
-import Link from 'next/link';
 import { Rocket, ExternalLink } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';

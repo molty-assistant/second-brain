@@ -38,7 +38,6 @@ export default function Dashboard() {
   // Show tasks in progress
   const inProgressTasks = allTasks.filter(t => t.status === 'in-progress').slice(0, 5);
   const recentDocs = getDocumentsByCategory('documents').slice(0, 3);
-  const recentJournal = getDocumentsByCategory('journal').slice(0, 3);
   const contentIdeas = getPipelineItems().filter(p => p.status === 'idea').slice(0, 3);
 
   return (
