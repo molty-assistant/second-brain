@@ -15,6 +15,12 @@ const eslintConfig = defineConfig([
 
     // Generated Convex bindings (safe to ignore + removes noisy lint warnings)
     "convex/_generated/**",
+
+    // Marketing pages are deprecated/paused; ignore until we remove them.
+    "src/app/marketing/**",
+    "src/app/marketing/**/*",
+    "src/app/marketing*.tsx",
+
   ]),
 ]);
 
