@@ -32,10 +32,6 @@ function ago(minDays: number, maxDays: number): number {
   return Math.round(NOW - offset);
 }
 
-function pick<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
 const activities = [
   {
     timestamp: ago(0, 0.5),
