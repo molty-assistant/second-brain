@@ -403,6 +403,30 @@ export default function TaskBoard({ tasks }: TaskBoardProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
+  const todoTasks = tasks.filter(t => t.status === 'todo');
+  const inProgressTasks = tasks.filter(t => t.status === 'in-progress');
+  const reviewTasks = tasks.filter(t => t.status === 'review');
+  const doneTasks = tasks.filter(t => t.status === 'done');
+
+  const handleSubmit = async (formData: FormData) => {
+    setIsSubmitting(true);
+    await createTask(formData);
+    setShowForm(false);
+    setIsSubmitting(false);
+    router.refresh();
+  };
+
+  const handleUpdate = async (id: string, updates: Partial<Task>) => {
+    await updateTask(id, updates);
+    setSelectedTask(null);
+    router.refresh();
+  };
+
+  const handleDelete = async (id: string) => {
+    await removeTask(id);
+    router.refresh();
+  };
+
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
@@ -454,31 +478,7 @@ export default function TaskBoard({ tasks }: TaskBoardProps) {
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [selectedTask, showForm]);
-  
-  const todoTasks = tasks.filter(t => t.status === 'todo');
-  const inProgressTasks = tasks.filter(t => t.status === 'in-progress');
-  const reviewTasks = tasks.filter(t => t.status === 'review');
-  const doneTasks = tasks.filter(t => t.status === 'done');
-  
-  const handleSubmit = async (formData: FormData) => {
-    setIsSubmitting(true);
-    await createTask(formData);
-    setShowForm(false);
-    setIsSubmitting(false);
-    router.refresh();
-  };
-  
-  const handleUpdate = async (id: string, updates: Partial<Task>) => {
-    await updateTask(id, updates);
-    setSelectedTask(null);
-    router.refresh();
-  };
-  
-  const handleDelete = async (id: string) => {
-    await removeTask(id);
-    router.refresh();
-  };
+  }, [selectedTask, showForm, handleDelete, handleUpdate]);
 
   return (
     <div>
