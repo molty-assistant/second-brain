@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createTask, updateTask, removeTask } from '@/app/actions';
-import { Plus, X, Clock, User, Bot, AlertCircle, ChevronRight, Calendar, Trash2 } from 'lucide-react';
+import { Plus, X, Clock, User, Bot, AlertCircle, ChevronRight, Calendar, Trash2, CheckSquare } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface Task {
@@ -384,8 +384,12 @@ function TaskColumn({
           <TaskCard key={task.id} task={task} onClick={() => onTaskClick(task)} />
         ))}
         {tasks.length === 0 && (
-          <div className="border border-dashed border-[#30363d] rounded-lg p-4 text-center">
-            <p className="text-sm text-[#6e7681]">No tasks</p>
+          <div className="border border-dashed border-[#30363d] rounded-lg p-6 text-center">
+            <div className="flex flex-col items-center gap-2">
+              <CheckSquare className="w-8 h-8 text-[#6e7681]" />
+              <p className="text-sm text-[#8b949e] font-medium">No tasks in this column</p>
+              <p className="text-xs text-[#6e7681]">Press <kbd className="px-1.5 py-0.5 border border-[#30363d] rounded bg-[#0d1117]">N</kbd> to add a task</p>
+            </div>
           </div>
         )}
       </div>
@@ -428,6 +432,24 @@ export default function TaskBoard({ tasks }: TaskBoardProps) {
         setSelectedTask(null);
         setShowForm(true);
       }
+
+      // E: edit selected task
+      if (!isTyping && (e.key === 'e' || e.key === 'E') && selectedTask) {
+        e.preventDefault();
+        // Toggle edit mode - we'd need to track edit state in selectedTask
+      }
+
+      // Delete/Backspace: delete selected task
+      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedTask && !isTyping) {
+        e.preventDefault();
+        if (confirm('Delete this task?')) {
+          handleDelete(selectedTask.id);
+          setSelectedTask(null);
+        }
+      }
+
+      // Ctrl/Cmd+S: save if editing (handled by form submit)
+      // Ctrl/Cmd+Enter: save update (handled by Ctrl+Enter in TaskDetailPanel)
     };
 
     window.addEventListener('keydown', onKeyDown);
