@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { createTask, updateTask, removeTask } from '@/app/actions';
 import { Plus, X, Clock, User, Bot, AlertCircle, ChevronRight, Calendar, Trash2, CheckSquare } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -37,7 +37,7 @@ const statusConfig = {
 function AssigneeBadge({ assignee, small = false }: { assignee: 'tom' | 'molty'; small?: boolean }) {
   const size = small ? 'text-xs px-1.5 py-0.5' : 'text-sm px-2 py-1';
   const iconSize = small ? 'w-3 h-3' : 'w-4 h-4';
-  
+
   if (assignee === 'molty') {
     return (
       <span className={`inline-flex items-center gap-1 ${size} rounded bg-[#58a6ff]/20 text-[#58a6ff]`}>
@@ -59,7 +59,7 @@ function PriorityBadge({ priority, small = false }: { priority: Task['priority']
   const Icon = config.icon;
   const size = small ? 'text-xs px-1.5 py-0.5' : 'text-sm px-2 py-1';
   const iconSize = small ? 'w-3 h-3' : 'w-4 h-4';
-  
+
   return (
     <span className={`inline-flex items-center gap-1 ${size} rounded ${config.color}`}>
       <Icon className={iconSize} />
@@ -68,13 +68,13 @@ function PriorityBadge({ priority, small = false }: { priority: Task['priority']
   );
 }
 
-function TaskDetailPanel({ 
-  task, 
-  onClose, 
+function TaskDetailPanel({
+  task,
+  onClose,
   onUpdate,
   onDelete,
-}: { 
-  task: Task; 
+}: {
+  task: Task;
   onClose: () => void;
   onUpdate: (id: string, updates: Partial<Task>) => void;
   onDelete: (id: string) => void;
@@ -91,16 +91,16 @@ function TaskDetailPanel({
 
   const handleAddUpdate = () => {
     if (!newUpdate.trim()) return;
-    
-    const timestamp = new Date().toLocaleDateString('en-GB', { 
-      day: 'numeric', 
+
+    const timestamp = new Date().toLocaleDateString('en-GB', {
+      day: 'numeric',
       month: 'short',
       hour: '2-digit',
       minute: '2-digit'
     });
     const authorLabel = updateAuthor === 'molty' ? '🦉 Molty' : '👤 Tom';
     const updateLine = `\n\n---\n**${authorLabel}** (${timestamp}):\n${newUpdate.trim()}`;
-    
+
     const updatedContent = (task.content || '') + updateLine;
     onUpdate(task.id, { content: updatedContent });
     setNewUpdate('');
@@ -346,11 +346,11 @@ function TaskCard({ task, onClick }: { task: Task; onClick: () => void }) {
         </h4>
         <PriorityBadge priority={task.priority} small />
       </div>
-      
+
       {task.notes && (
         <p className="text-xs text-[#8b949e] line-clamp-2 mb-2">{task.notes}</p>
       )}
-      
+
       <div className="flex items-center justify-between">
         <AssigneeBadge assignee={task.assignee} small />
         <span className="text-xs text-[#6e7681]">{task.created}</span>
@@ -359,17 +359,17 @@ function TaskCard({ task, onClick }: { task: Task; onClick: () => void }) {
   );
 }
 
-function TaskColumn({ 
+function TaskColumn({
   status,
-  tasks, 
+  tasks,
   onTaskClick,
-}: { 
+}: {
   status: Task['status'];
   tasks: Task[];
   onTaskClick: (task: Task) => void;
 }) {
   const config = statusConfig[status];
-  
+
   return (
     <div className="flex-1 min-w-[280px]">
       <div className="flex items-center gap-2 mb-4">
@@ -378,7 +378,7 @@ function TaskColumn({
         <span className="text-sm text-[#6e7681]">{tasks.length}</span>
       </div>
       <p className="text-xs text-[#8b949e] mb-4">{config.description}</p>
-      
+
       <div className="space-y-2">
         {tasks.map(task => (
           <TaskCard key={task.id} task={task} onClick={() => onTaskClick(task)} />
@@ -416,16 +416,16 @@ export default function TaskBoard({ tasks }: TaskBoardProps) {
     router.refresh();
   };
 
-  const handleUpdate = async (id: string, updates: Partial<Task>) => {
+  const handleUpdate = useCallback(async (id: string, updates: Partial<Task>) => {
     await updateTask(id, updates);
     setSelectedTask(null);
     router.refresh();
-  };
+  }, [router]);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = useCallback(async (id: string) => {
     await removeTask(id);
     router.refresh();
-  };
+  }, [router]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -500,8 +500,8 @@ export default function TaskBoard({ tasks }: TaskBoardProps) {
               className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-[#e6edf3] placeholder-[#6e7681] focus:outline-none focus:border-[#58a6ff] mb-3 resize-none"
             />
             <div className="flex flex-wrap items-center gap-3">
-              <select 
-                name="status" 
+              <select
+                name="status"
                 defaultValue="todo"
                 className="bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-[#e6edf3] focus:outline-none focus:border-[#58a6ff]"
               >
@@ -509,8 +509,8 @@ export default function TaskBoard({ tasks }: TaskBoardProps) {
                 <option value="in-progress">In Progress</option>
                 <option value="review">Review</option>
               </select>
-              <select 
-                name="priority" 
+              <select
+                name="priority"
                 defaultValue="next"
                 className="bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-[#e6edf3] focus:outline-none focus:border-[#58a6ff]"
               >
@@ -518,8 +518,8 @@ export default function TaskBoard({ tasks }: TaskBoardProps) {
                 <option value="next">🟠 Next</option>
                 <option value="later">⚪ Later</option>
               </select>
-              <select 
-                name="assignee" 
+              <select
+                name="assignee"
                 defaultValue="tom"
                 className="bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-[#e6edf3] focus:outline-none focus:border-[#58a6ff]"
               >
