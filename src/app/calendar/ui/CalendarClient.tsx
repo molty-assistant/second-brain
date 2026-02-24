@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useQuery } from 'convex/react';
 import { convexApi } from '@/lib/convexApi';
 import {
@@ -12,6 +12,7 @@ import {
   isSameDay,
 } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import TaskDrawer from './TaskDrawer';
 
 type ScheduledTask = {
   _id: string;
@@ -33,14 +34,24 @@ const agentColors: Record<string, string> = {
 
 function colorForAgent(agent: string) {
   const key = agent.toLowerCase();
-  return (
-    agentColors[key] ??
-    'border-[#30363d] bg-[#21262d]/40 text-[#e6edf3]'
-  );
+  return agentColors[key] || 'border-[#30363d] bg-[#21262d]/40 text-[#e6edf3]';
 }
 
 export default function CalendarClient() {
   const [weekOffset, setWeekOffset] = useState(0);
+  const [selectedTask, setSelectedTask] = useState<ScheduledTask | null>(null);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && selectedTask) {
+        e.preventDefault();
+        setSelectedTask(null);
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [selectedTask]);
 
   const weekStart = useMemo(
     () => startOfWeek(addWeeks(new Date(), weekOffset), { weekStartsOn: 1 }),
@@ -57,33 +68,35 @@ export default function CalendarClient() {
   const days = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)), [weekStart]);
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setWeekOffset((w) => w - 1)}
-            className="p-2 rounded-md border border-[#30363d] bg-[#161b22] hover:bg-[#21262d]/50 transition-colors"
-            aria-label="Previous week"
-          >
-            <ChevronLeft className="w-4 h-4 text-[#8b949e]" />
-          </button>
-          <button
-            onClick={() => setWeekOffset(0)}
-            className="px-3 py-2 rounded-md border border-[#30363d] bg-[#161b22] text-sm text-[#e6edf3] hover:bg-[#21262d]/50 transition-colors"
-          >
-            This week
-          </button>
-          <button
-            onClick={() => setWeekOffset((w) => w + 1)}
-            className="p-2 rounded-md border border-[#30363d] bg-[#161b22] hover:bg-[#21262d]/50 transition-colors"
-            aria-label="Next week"
-          >
-            <ChevronRight className="w-4 h-4 text-[#8b949e]" />
-          </button>
-        </div>
+    <>
+      <div className="mb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setWeekOffset((w) => w - 1)}
+              className="p-2 rounded-md border border-[#30363d] bg-[#161b22] hover:bg-[#21262d]/50 transition-colors"
+              aria-label="Previous week"
+            >
+              <ChevronLeft className="w-4 h-4 text-[#8b949e]" />
+            </button>
+            <button
+              onClick={() => setWeekOffset(0)}
+              className="px-3 py-2 rounded-md border border-[#30363d] bg-[#161b22] text-sm text-[#e6edf3] hover:bg-[#21262d]/50 transition-colors"
+            >
+              This week
+            </button>
+            <button
+              onClick={() => setWeekOffset((w) => w + 1)}
+              className="p-2 rounded-md border border-[#30363d] bg-[#161b22] hover:bg-[#21262d]/50 transition-colors"
+              aria-label="Next week"
+            >
+              <ChevronRight className="w-4 h-4 text-[#8b949e]" />
+            </button>
+          </div>
 
-        <div className="text-sm text-[#8b949e]">
-          {format(weekStart, 'dd MMM')} – {format(weekEnd, 'dd MMM yyyy')}
+          <div className="text-sm text-[#8b949e]">
+            {format(weekStart, 'dd MMM')} – {format(weekEnd, 'dd MMM yyyy')}
+          </div>
         </div>
       </div>
 
@@ -102,9 +115,10 @@ export default function CalendarClient() {
               </div>
               <div className="p-2 space-y-2 min-h-[120px]">
                 {dayTasks.map((t) => (
-                  <div
+                  <button
                     key={t._id}
-                    className={`border rounded-md px-2 py-1.5 ${colorForAgent(t.assignedTo)}`}
+                    onClick={() => setSelectedTask(t)}
+                    className={`border rounded-md px-2 py-1.5 w-full text-left hover:border-[#58a6ff]/60 hover:bg-[#21262d]/50 transition-colors ${colorForAgent(t.assignedTo)}`}
                     title={t.description}
                   >
                     <div className="flex items-center justify-between gap-2">
@@ -112,7 +126,7 @@ export default function CalendarClient() {
                       <div className="text-[10px] opacity-80">{format(new Date(t.scheduledAt), 'HH:mm')}</div>
                     </div>
                     <div className="text-[10px] opacity-80 truncate">{t.assignedTo} • {t.status}</div>
-                  </div>
+                  </button>
                 ))}
 
                 {tasks && dayTasks.length === 0 && (
@@ -125,6 +139,8 @@ export default function CalendarClient() {
           );
         })}
       </div>
-    </div>
+
+      <TaskDrawer task={selectedTask} onClose={() => setSelectedTask(null)} />
+    </>
   );
 }
