@@ -1,20 +1,10 @@
 import { getDocumentsByCategory } from '@/lib/documents';
 import Sidebar from '@/components/Sidebar';
+import ConvexSetupNotice from '@/components/ConvexSetupNotice';
 import EmployeesClient from './ui/EmployeesClient';
 import { Users } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-
-function SetupNotice() {
-  return (
-    <div className="bg-[#161b22] border border-[#30363d] rounded-lg p-6">
-      <h2 className="text-lg font-semibold text-[#e6edf3] mb-2">Convex not configured</h2>
-      <p className="text-sm text-[#8b949e]">
-        Set <code className="text-[#e6edf3]">NEXT_PUBLIC_CONVEX_URL</code> to enable the employee dashboard.
-      </p>
-    </div>
-  );
-}
 
 export default function EmployeesPage() {
   const documents = getDocumentsByCategory('documents');
@@ -36,7 +26,7 @@ export default function EmployeesPage() {
             </div>
           </div>
 
-          {hasConvex ? <EmployeesClient /> : <SetupNotice />}
+          {hasConvex ? <EmployeesClient /> : <ConvexSetupNotice />}
         </div>
       </main>
     </div>
