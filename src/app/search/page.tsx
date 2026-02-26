@@ -1,20 +1,10 @@
 import { getDocumentsByCategory } from '@/lib/documents';
 import Sidebar from '@/components/Sidebar';
+import ConvexSetupNotice from '@/components/ConvexSetupNotice';
 import SearchClient from './ui/SearchClient';
 import { Search } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-
-function SetupNotice() {
-  return (
-    <div className="bg-[#161b22] border border-[#30363d] rounded-lg p-6">
-      <h2 className="text-lg font-semibold text-[#e6edf3] mb-2">Convex not configured</h2>
-      <p className="text-sm text-[#8b949e]">
-        Set <code className="text-[#e6edf3]">NEXT_PUBLIC_CONVEX_URL</code> to enable global search.
-      </p>
-    </div>
-  );
-}
 
 export default function SearchPage() {
   const documents = getDocumentsByCategory('documents');
@@ -36,7 +26,7 @@ export default function SearchPage() {
             </div>
           </div>
 
-          {hasConvex ? <SearchClient /> : <SetupNotice />}
+          {hasConvex ? <SearchClient /> : <ConvexSetupNotice />}
         </div>
       </main>
     </div>

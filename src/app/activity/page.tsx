@@ -1,20 +1,10 @@
 import { getDocumentsByCategory } from '@/lib/documents';
 import Sidebar from '@/components/Sidebar';
+import ConvexSetupNotice from '@/components/ConvexSetupNotice';
 import ActivityClient from './ui/ActivityClient';
 import { Activity } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-
-function SetupNotice() {
-  return (
-    <div className="bg-[#161b22] border border-[#30363d] rounded-lg p-6">
-      <h2 className="text-lg font-semibold text-[#e6edf3] mb-2">Convex not configured</h2>
-      <p className="text-sm text-[#8b949e]">
-        Set <code className="text-[#e6edf3]">NEXT_PUBLIC_CONVEX_URL</code> to enable Mission Control v2 pages.
-      </p>
-    </div>
-  );
-}
 
 export default function ActivityPage() {
   const documents = getDocumentsByCategory('documents');
@@ -36,7 +26,7 @@ export default function ActivityPage() {
             </div>
           </div>
 
-          {hasConvex ? <ActivityClient /> : <SetupNotice />}
+          {hasConvex ? <ActivityClient /> : <ConvexSetupNotice />}
         </div>
       </main>
     </div>
