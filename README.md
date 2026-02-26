@@ -38,14 +38,23 @@ tags: [concept, important]
 
 ## Authentication
 
-The app supports optional Basic Auth protection via environment variables:
+Copy `.env.example` to `.env.local`, then set the environment variables you need.
 
 ```bash
+# Optional Basic Auth protection
 BASIC_AUTH_USER=your-username
 BASIC_AUTH_PASS=your-password
+
+# Convex client URL
+NEXT_PUBLIC_CONVEX_URL=https://<your-deployment>.convex.cloud
+
+# Optional server-side Convex URL override
+CONVEX_URL=https://<your-deployment>.convex.cloud
 ```
 
-If these are not set, the app runs without authentication (useful for local development).
+If `BASIC_AUTH_USER` and `BASIC_AUTH_PASS` are not set, the app runs without authentication (useful for local development).
+
+Convex setup: see [/doc/documents/convex-setup](/doc/documents/convex-setup).
 
 ## Getting Started
 
