@@ -1,12 +1,13 @@
 import { getDocumentsByCategory } from '@/lib/documents';
 import { getTasks, getPipelineItems, getStats } from '@/lib/hub';
 import Link from 'next/link';
-import { 
-  Brain, 
-  CheckSquare, 
-  FileText, 
-  Calendar, 
-  Lightbulb, 
+import TodayCard from '@/app/ui/TodayCard';
+import {
+  Brain,
+  CheckSquare,
+  FileText,
+  Calendar,
+  Lightbulb,
   Rocket,
   ArrowRight,
   Clock
@@ -93,6 +94,9 @@ export default function Dashboard() {
             <div className="text-2xl font-bold text-[#e6edf3]">{stats.contentDrafting}</div>
           </Link>
         </div>
+
+        {/* Today Card */}
+        <TodayCard />
 
         {/* Navigation Cards */}
         <div className="grid md:grid-cols-3 gap-4 mb-8">
