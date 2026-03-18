@@ -1,6 +1,16 @@
-# Second Brain
+# Mission Control / Second Brain
 
-A personal knowledge base for capturing and connecting ideas — built with Next.js 14 and styled like a mix of Obsidian and Linear.
+Mission Control is Tom's private operating system for tasks, agent status, docs, backlog, calendar, and activity.
+
+This repo is still named `second-brain`, but it is the codebase for the **Mission Control** app deployed on Railway.
+
+Canonical identities:
+- **Mission Control app:** `https://mission-control-production-2304.up.railway.app`
+- **Railway project:** `mission-control`
+- **Repo:** `molty-assistant/second-brain`
+- **Not this app:** `https://molty.marketing` and the `marketing-tool` repo/app
+
+Under the hood, it is still a personal knowledge base for capturing and connecting ideas — built with Next.js and styled like a mix of Obsidian and Linear.
 
 ## Features
 
