@@ -4,6 +4,7 @@ import Link from 'next/link';
 import TodayCard from '@/app/ui/TodayCard';
 import AgentStatusBar from '@/app/ui/AgentStatusBar';
 import CalendarPreview from '@/app/ui/CalendarPreview';
+import ActivityFeed from '@/app/ui/ActivityFeed';
 import {
   Brain,
   CheckSquare,
@@ -12,7 +13,6 @@ import {
   Lightbulb,
   Rocket,
   ArrowRight,
-  Clock,
   Users,
   ClipboardList,
   BookOpen,
@@ -209,6 +209,9 @@ export default function Dashboard() {
           <div className="space-y-6">
             {/* Calendar preview */}
             {hasConvex && <CalendarPreview />}
+
+            {/* Live activity feed */}
+            {hasConvex && <ActivityFeed />}
 
             {/* Recent docs - quick access */}
             {recentDocs.length > 0 && (
