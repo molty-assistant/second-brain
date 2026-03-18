@@ -101,7 +101,7 @@ export default function DocumentsClient({ documents }: { documents: DocumentMeta
           {search && (
             <span>
               · matching{' '}
-              <span className="text-[#e6edf3]">"{search}"</span>
+              <span className="text-[#e6edf3]">&quot;{search}&quot;</span>
             </span>
           )}
         </div>
