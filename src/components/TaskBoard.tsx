@@ -363,15 +363,41 @@ function TaskColumn({
   status,
   tasks,
   onTaskClick,
+  onDropTask,
 }: {
   status: Task['status'];
   tasks: Task[];
   onTaskClick: (task: Task) => void;
+  onDropTask?: (taskId: string, newStatus: Task['status']) => void;
 }) {
   const config = statusConfig[status];
+  const [dragOver, setDragOver] = useState(false);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(true);
+  };
+
+  const handleDragLeave = () => {
+    setDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const taskId = e.dataTransfer.getData('text/plain');
+    if (taskId && onDropTask) {
+      onDropTask(taskId, status);
+    }
+  };
 
   return (
-    <div className="flex-1 min-w-[280px]">
+    <div
+      className={`flex-1 min-w-[280px] transition-colors ${dragOver ? 'bg-[#21262d]' : ''}`}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       <div className="flex items-center gap-2 mb-4">
         <div className={`w-3 h-3 rounded-full ${config.color}`}></div>
         <h3 className="font-semibold text-[#e6edf3]">{config.label}</h3>
