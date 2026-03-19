@@ -1,4 +1,4 @@
-import { query, mutation } from "./_generated/server";
+import { query, mutation, type QueryCtx, type MutationCtx } from "./_generated/server";
 import { v } from "convex/values";
 
 export const list = query({
@@ -127,18 +127,18 @@ export const updateStatus = mutation({
 });
 
 // Resolve an employee by name OR agentId (agents use agentId, humans use name)
-async function resolveEmployee(ctx: any, identifier: string) {
+async function resolveEmployee(ctx: QueryCtx | MutationCtx, identifier: string) {
   // Try agentId first (e.g. "default", "social-manager", "engineering-manager")
   const byAgent = await ctx.db
     .query("employees")
-    .withIndex("by_agentId", (q: any) => q.eq("agentId", identifier))
+    .withIndex("by_agentId", (q) => q.eq("agentId", identifier))
     .take(1);
   if (byAgent.length > 0) return byAgent[0];
 
   // Fall back to name (e.g. "Molty", "Codex")
   const byName = await ctx.db
     .query("employees")
-    .withIndex("by_name", (q: any) => q.eq("name", identifier))
+    .withIndex("by_name", (q) => q.eq("name", identifier))
     .take(1);
   return byName[0] ?? null;
 }
