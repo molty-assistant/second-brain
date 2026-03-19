@@ -2,15 +2,25 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { createTask, updateTask, removeTask } from '@/app/actions';
-import { Plus, X, Clock, User, Bot, AlertCircle, ChevronRight, Calendar, Trash2, CheckSquare } from 'lucide-react';
+import { Plus, X, Clock, AlertCircle, ChevronRight, Calendar, Trash2, CheckSquare } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+
+const ASSIGNEES = [
+  { value: 'tom', label: 'Tom', icon: '👤', color: 'bg-[#a371f7]/20 text-[#a371f7]' },
+  { value: 'molty', label: 'Molty', icon: '🦉', color: 'bg-[#58a6ff]/20 text-[#58a6ff]' },
+  { value: 'eddy', label: 'Eddy', icon: '🧁', color: 'bg-[#f0883e]/20 text-[#f0883e]' },
+  { value: 'codex', label: 'Codex', icon: '⚡', color: 'bg-[#3fb950]/20 text-[#3fb950]' },
+  { value: 'social-manager', label: 'Social', icon: '📱', color: 'bg-[#d29922]/20 text-[#d29922]' },
+  { value: 'gemini', label: 'Gemini', icon: '✨', color: 'bg-[#da3633]/20 text-[#da3633]' },
+  { value: 'perplexity', label: 'Perplexity', icon: '🔍', color: 'bg-[#6e7681]/20 text-[#8b949e]' },
+] as const;
 
 interface Task {
   id: string;
   title: string;
   status: 'todo' | 'in-progress' | 'review' | 'done';
   priority: 'now' | 'next' | 'later';
-  assignee: 'tom' | 'molty';
+  assignee: string;
   created: string;
   completed?: string;
   notes?: string;
@@ -34,22 +44,14 @@ const statusConfig = {
   done: { label: 'Done', color: 'bg-[#3fb950]', description: 'Completed' },
 };
 
-function AssigneeBadge({ assignee, small = false }: { assignee: 'tom' | 'molty'; small?: boolean }) {
+function AssigneeBadge({ assignee, small = false }: { assignee: string; small?: boolean }) {
   const size = small ? 'text-xs px-1.5 py-0.5' : 'text-sm px-2 py-1';
-  const iconSize = small ? 'w-3 h-3' : 'w-4 h-4';
+  const config = ASSIGNEES.find((a) => a.value === assignee) ?? ASSIGNEES[0];
 
-  if (assignee === 'molty') {
-    return (
-      <span className={`inline-flex items-center gap-1 ${size} rounded bg-[#58a6ff]/20 text-[#58a6ff]`}>
-        <Bot className={iconSize} />
-        Molty
-      </span>
-    );
-  }
   return (
-    <span className={`inline-flex items-center gap-1 ${size} rounded bg-[#a371f7]/20 text-[#a371f7]`}>
-      <User className={iconSize} />
-      Tom
+    <span className={`inline-flex items-center gap-1 ${size} rounded ${config.color}`}>
+      <span className={small ? 'text-xs' : 'text-sm'}>{config.icon}</span>
+      {config.label}
     </span>
   );
 }
@@ -82,7 +84,7 @@ function TaskDetailPanel({
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState(task);
   const [newUpdate, setNewUpdate] = useState('');
-  const [updateAuthor, setUpdateAuthor] = useState<'tom' | 'molty'>('tom');
+  const [updateAuthor, setUpdateAuthor] = useState('tom');
 
   const handleSave = () => {
     onUpdate(task.id, editedTask);
@@ -98,7 +100,8 @@ function TaskDetailPanel({
       hour: '2-digit',
       minute: '2-digit'
     });
-    const authorLabel = updateAuthor === 'molty' ? '🦉 Molty' : '👤 Tom';
+    const authorConfig = ASSIGNEES.find((a) => a.value === updateAuthor) ?? ASSIGNEES[0];
+    const authorLabel = `${authorConfig.icon} ${authorConfig.label}`;
     const updateLine = `\n\n---\n**${authorLabel}** (${timestamp}):\n${newUpdate.trim()}`;
 
     const updatedContent = (task.content || '') + updateLine;
@@ -180,11 +183,12 @@ function TaskDetailPanel({
             {isEditing ? (
               <select
                 value={editedTask.assignee}
-                onChange={e => setEditedTask({ ...editedTask, assignee: e.target.value as Task['assignee'] })}
+                onChange={e => setEditedTask({ ...editedTask, assignee: e.target.value })}
                 className="w-full bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-[#e6edf3] focus:outline-none focus:border-[#58a6ff]"
               >
-                <option value="tom">👤 Tom</option>
-                <option value="molty">🦉 Molty</option>
+                {ASSIGNEES.map((a) => (
+                  <option key={a.value} value={a.value}>{a.icon} {a.label}</option>
+                ))}
               </select>
             ) : (
               <AssigneeBadge assignee={task.assignee} />
@@ -253,11 +257,12 @@ function TaskDetailPanel({
               <div className="flex items-center gap-2">
                 <select
                   value={updateAuthor}
-                  onChange={e => setUpdateAuthor(e.target.value as 'tom' | 'molty')}
+                  onChange={e => setUpdateAuthor(e.target.value)}
                   className="bg-[#0d1117] border border-[#30363d] rounded-md px-2 py-1 text-sm text-[#e6edf3] focus:outline-none focus:border-[#58a6ff]"
                 >
-                  <option value="tom">👤 Tom</option>
-                  <option value="molty">🦉 Molty</option>
+                  {ASSIGNEES.map((a) => (
+                    <option key={a.value} value={a.value}>{a.icon} {a.label}</option>
+                  ))}
                 </select>
                 <button
                   onClick={handleAddUpdate}
@@ -549,8 +554,9 @@ export default function TaskBoard({ tasks }: TaskBoardProps) {
                 defaultValue="tom"
                 className="bg-[#0d1117] border border-[#30363d] rounded-md px-3 py-2 text-[#e6edf3] focus:outline-none focus:border-[#58a6ff]"
               >
-                <option value="tom">👤 Tom</option>
-                <option value="molty">🦉 Molty</option>
+                {ASSIGNEES.map((a) => (
+                  <option key={a.value} value={a.value}>{a.icon} {a.label}</option>
+                ))}
               </select>
               <button
                 type="submit"

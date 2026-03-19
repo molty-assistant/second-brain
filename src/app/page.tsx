@@ -37,6 +37,20 @@ function formatDate(date: Date) {
   });
 }
 
+const ASSIGNEE_STYLES: Record<string, { color: string; label: string }> = {
+  tom: { color: 'bg-[#a371f7]/15 text-[#a371f7]', label: '👤 Tom' },
+  molty: { color: 'bg-[#58a6ff]/15 text-[#58a6ff]', label: '🦉 Molty' },
+  eddy: { color: 'bg-[#f0883e]/15 text-[#f0883e]', label: '🧁 Eddy' },
+  codex: { color: 'bg-[#3fb950]/15 text-[#3fb950]', label: '⚡ Codex' },
+  'social-manager': { color: 'bg-[#d29922]/15 text-[#d29922]', label: '📱 Social' },
+  gemini: { color: 'bg-[#da3633]/15 text-[#da3633]', label: '✨ Gemini' },
+  perplexity: { color: 'bg-[#6e7681]/15 text-[#8b949e]', label: '🔍 Perplexity' },
+};
+
+function assigneeStyle(assignee: string) {
+  return ASSIGNEE_STYLES[assignee] ?? ASSIGNEE_STYLES.tom;
+}
+
 export default function Dashboard() {
   const stats = getStats();
   const allTasks = getTasks();
@@ -132,13 +146,9 @@ export default function Dashboard() {
                         )}
                       </div>
                       <span
-                        className={`text-xs px-2 py-0.5 rounded shrink-0 ml-3 ${
-                          task.assignee === 'molty'
-                            ? 'bg-[#58a6ff]/15 text-[#58a6ff]'
-                            : 'bg-[#a371f7]/15 text-[#a371f7]'
-                        }`}
+                        className={`text-xs px-2 py-0.5 rounded shrink-0 ml-3 ${assigneeStyle(task.assignee).color}`}
                       >
-                        {task.assignee === 'molty' ? '🦉 Molty' : '👤 Tom'}
+                        {assigneeStyle(task.assignee).label}
                       </span>
                     </Link>
                   ))}
@@ -179,13 +189,9 @@ export default function Dashboard() {
                         <span className="text-[10px] text-[#6e7681] shrink-0">({task.status})</span>
                       </div>
                       <span
-                        className={`text-xs px-2 py-0.5 rounded shrink-0 ml-3 ${
-                          task.assignee === 'molty'
-                            ? 'bg-[#58a6ff]/15 text-[#58a6ff]'
-                            : 'bg-[#a371f7]/15 text-[#a371f7]'
-                        }`}
+                        className={`text-xs px-2 py-0.5 rounded shrink-0 ml-3 ${assigneeStyle(task.assignee).color}`}
                       >
-                        {task.assignee === 'molty' ? '🦉 Molty' : '👤 Tom'}
+                        {assigneeStyle(task.assignee).label}
                       </span>
                     </Link>
                   ))}

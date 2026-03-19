@@ -14,6 +14,7 @@ import {
   Activity,
   Users,
   ClipboardList,
+  Settings,
 } from 'lucide-react';
 
 interface DocumentMeta {
@@ -132,6 +133,17 @@ export default function Sidebar({ documents, journalEntries }: SidebarProps) {
             >
               <ClipboardList className="w-4 h-4" />
               <span>Backlog</span>
+            </Link>
+            <Link
+              href="/briefings"
+              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
+                pathname === '/briefings'
+                  ? 'bg-[#21262d] text-[#e6edf3]'
+                  : 'text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d]/50'
+              }`}
+            >
+              <Settings className="w-4 h-4" />
+              <span>Briefings</span>
             </Link>
             <Link
               href="/search"

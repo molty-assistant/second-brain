@@ -10,7 +10,7 @@ export interface Task {
   title: string;
   status: 'todo' | 'in-progress' | 'review' | 'done';
   priority: 'now' | 'next' | 'later';
-  assignee: 'tom' | 'molty';
+  assignee: string;
   created: string;
   completed?: string;
   notes?: string;

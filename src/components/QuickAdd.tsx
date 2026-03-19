@@ -26,7 +26,7 @@ export default function QuickAdd({ onCreated }: QuickAddProps) {
   const [status, setStatus] = useState('');
   const [priority, setPriority] = useState<'now' | 'next' | 'later'>('next');
   const [type, setType] = useState('post');
-  const [assignee, setAssignee] = useState<'tom' | 'molty'>('tom');
+  const [assignee, setAssignee] = useState('tom');
   const [description, setDescription] = useState('');
   const [context, setContext] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);

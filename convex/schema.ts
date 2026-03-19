@@ -45,6 +45,7 @@ export default defineSchema({
 
   employees: defineTable({
     name: v.string(),
+    agentId: v.optional(v.string()), // OpenClaw agent id: "default", "social-manager", "engineering-manager", or null for external tools
     role: v.string(),
     model: v.string(),
     status: v.string(), // idle | working | offline | error
@@ -52,13 +53,39 @@ export default defineSchema({
     lastActiveAt: v.optional(v.number()),
     tasksCompleted: v.number(),
     costType: v.string(), // free | subscription | per-token | per-query
+    costToDateUSD: v.optional(v.number()),
+    tokensToDate: v.optional(v.number()),
   })
     .index("by_name", ["name"])
+    .index("by_agentId", ["agentId"])
     .index("by_status", ["status"])
     .searchIndex("search_employee", {
       searchField: "name",
       filterFields: ["status", "role"],
     }),
+
+  agentControls: defineTable({
+    agentId: v.string(), // matches employee name or openclaw agent id
+    paused: v.boolean(),
+    pausedAt: v.optional(v.number()),
+    pausedReason: v.optional(v.string()),
+    updatedAt: v.number(),
+  })
+    .index("by_agentId", ["agentId"]),
+
+  briefingConfig: defineTable({
+    briefingType: v.string(), // "am" | "pm"
+    sections: v.array(
+      v.object({
+        key: v.string(),
+        label: v.string(),
+        enabled: v.boolean(),
+      })
+    ),
+    newsTopics: v.optional(v.array(v.string())),
+    updatedAt: v.number(),
+  })
+    .index("by_type", ["briefingType"]),
 
   backlogTasks: defineTable({
     taskId: v.string(), // BL-001 etc
