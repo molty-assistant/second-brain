@@ -127,7 +127,16 @@ export const updateStatusByName = mutation({
     lastActiveAt: v.optional(v.number()),
     tasksCompletedDelta: v.optional(v.number()),
   },
-  handler: async (ctx, args) => {
+  handler: async (
+    ctx: MutationCtx,
+    args: {
+      name: string;
+      status: string;
+      currentTask?: string;
+      lastActiveAt?: number;
+      tasksCompletedDelta?: number;
+    },
+  ) => {
     const doc = await resolveEmployee(ctx, args.name);
     if (!doc) return { found: false };
 
@@ -148,7 +157,14 @@ export const logCost = mutation({
     costUSD: v.number(),
     tokens: v.number(),
   },
-  handler: async (ctx, args) => {
+  handler: async (
+    ctx: MutationCtx,
+    args: {
+      name: string;
+      costUSD: number;
+      tokens: number;
+    },
+  ) => {
     const doc = await resolveEmployee(ctx, args.name);
     if (!doc) return { found: false };
 
