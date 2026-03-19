@@ -9,6 +9,31 @@ export const list = query({
   },
 });
 
+// The 3 real OpenClaw agents — these are the only "employees"
+const AGENTS = [
+  {
+    name: "Molty",
+    agentId: "default",
+    role: "CEO / Strategist",
+    model: "OpenClaw (multi-model)",
+    costType: "subscription",
+  },
+  {
+    name: "Eddy",
+    agentId: "engineering-manager",
+    role: "Engineering Manager",
+    model: "OpenClaw (multi-model)",
+    costType: "subscription",
+  },
+  {
+    name: "Sid",
+    agentId: "social-manager",
+    role: "Social Media Manager",
+    model: "OpenClaw (multi-model)",
+    costType: "subscription",
+  },
+];
+
 export const seed = mutation({
   args: {},
   handler: async (ctx) => {
@@ -16,91 +41,41 @@ export const seed = mutation({
     if (existing.length > 0) return { seeded: false };
 
     const now = Date.now();
-    const employees = [
-      {
-        name: "Molty",
-        agentId: "default",
-        role: "CEO/Strategist",
-        model: "claude-opus-4-6",
+    for (const agent of AGENTS) {
+      await ctx.db.insert("employees", {
+        ...agent,
         status: "idle",
         currentTask: undefined,
         lastActiveAt: now,
         tasksCompleted: 0,
-        costType: "subscription",
-      },
-      {
-        name: "Eddy",
-        agentId: "engineering-manager",
-        role: "Engineering Manager",
-        model: "claude-opus-4-6",
-        status: "idle",
-        currentTask: undefined,
-        lastActiveAt: now,
-        tasksCompleted: 0,
-        costType: "subscription",
-      },
-      {
-        name: "Sid",
-        agentId: "social-manager",
-        role: "Social Media Manager",
-        model: "claude-opus-4-6",
-        status: "idle",
-        currentTask: undefined,
-        lastActiveAt: now,
-        tasksCompleted: 0,
-        costType: "subscription",
-      },
-      {
-        name: "Codex",
-        agentId: undefined,
-        role: "Senior Engineer",
-        model: "gpt-5.2",
-        status: "idle",
-        currentTask: undefined,
-        lastActiveAt: now,
-        tasksCompleted: 0,
-        costType: "subscription",
-      },
-      {
-        name: "Ministral 3B",
-        agentId: undefined,
-        role: "Copy Editor",
-        model: "mistralai/ministral-3-3b",
-        status: "idle",
-        currentTask: undefined,
-        lastActiveAt: now,
-        tasksCompleted: 0,
-        costType: "free",
-      },
-      {
-        name: "Perplexity",
-        agentId: undefined,
-        role: "Research Analyst",
-        model: "sonar",
-        status: "idle",
-        currentTask: undefined,
-        lastActiveAt: now,
-        tasksCompleted: 0,
-        costType: "per-query",
-      },
-      {
-        name: "Gemini",
-        agentId: undefined,
-        role: "Creative Director",
-        model: "gemini-2.5-flash",
-        status: "idle",
-        currentTask: undefined,
-        lastActiveAt: now,
-        tasksCompleted: 0,
-        costType: "free",
-      },
-    ];
-
-    for (const e of employees) {
-      await ctx.db.insert("employees", e);
+      });
     }
 
-    return { seeded: true, count: employees.length };
+    return { seeded: true, count: AGENTS.length };
+  },
+});
+
+// Wipe and re-seed with only real OpenClaw agents
+export const reseed = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const all = await ctx.db.query("employees").collect();
+    for (const doc of all) {
+      await ctx.db.delete(doc._id);
+    }
+
+    const now = Date.now();
+    for (const agent of AGENTS) {
+      await ctx.db.insert("employees", {
+        ...agent,
+        status: "idle",
+        currentTask: undefined,
+        lastActiveAt: now,
+        tasksCompleted: 0,
+      });
+    }
+
+    return { reseeded: true, count: AGENTS.length };
   },
 });
 
