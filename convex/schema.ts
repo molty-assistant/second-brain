@@ -87,6 +87,21 @@ export default defineSchema({
   })
     .index("by_type", ["briefingType"]),
 
+  cronJobs: defineTable({
+    jobId: v.string(), // OpenClaw cron job UUID
+    name: v.string(),
+    agentId: v.string(), // "main", "default", "social-manager", "engineering-manager"
+    schedule: v.string(), // cron expression e.g. "0 7 * * *"
+    tz: v.optional(v.string()),
+    enabled: v.boolean(),
+    lastRunAtMs: v.optional(v.number()),
+    lastStatus: v.optional(v.string()), // "ok" | "error"
+    consecutiveErrors: v.optional(v.number()),
+    updatedAt: v.number(),
+  })
+    .index("by_jobId", ["jobId"])
+    .index("by_agentId", ["agentId"]),
+
   backlogTasks: defineTable({
     taskId: v.string(), // BL-001 etc
     title: v.string(),

@@ -12,6 +12,7 @@ import type * as activities from "../activities.js";
 import type * as agentControls from "../agentControls.js";
 import type * as backlog from "../backlog.js";
 import type * as briefingConfig from "../briefingConfig.js";
+import type * as cronJobs from "../cronJobs.js";
 import type * as employees from "../employees.js";
 import type * as http from "../http.js";
 import type * as scheduledTasks from "../scheduledTasks.js";
@@ -28,6 +29,7 @@ declare const fullApi: ApiFromModules<{
   agentControls: typeof agentControls;
   backlog: typeof backlog;
   briefingConfig: typeof briefingConfig;
+  cronJobs: typeof cronJobs;
   employees: typeof employees;
   http: typeof http;
   scheduledTasks: typeof scheduledTasks;

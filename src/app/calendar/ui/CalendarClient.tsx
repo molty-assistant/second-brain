@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState, useEffect } from 'react';
-import { useQuery } from 'convex/react';
+import { useMutation, useQuery } from 'convex/react';
 import { convexApi } from '@/lib/convexApi';
 import {
   addDays,
@@ -11,8 +11,48 @@ import {
   endOfWeek,
   isSameDay,
 } from 'date-fns';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, AlertTriangle } from 'lucide-react';
 import TaskDrawer from './TaskDrawer';
+
+type CronJob = {
+  _id: string;
+  jobId: string;
+  name: string;
+  agentId: string;
+  schedule: string;
+  tz?: string;
+  enabled: boolean;
+  lastRunAtMs?: number;
+  lastStatus?: string;
+  consecutiveErrors?: number;
+  updatedAt: number;
+};
+
+const AGENT_LABELS: Record<string, string> = {
+  main: 'Molty',
+  default: 'Molty',
+  'social-manager': 'Sid',
+  'engineering-manager': 'Eddy',
+};
+
+function formatSchedule(expr: string) {
+  const parts = expr.split(' ');
+  if (parts.length !== 5) return expr;
+  const [min, hour, dom, , dow] = parts;
+  if (dom !== '*') return expr;
+  if (dow === '*') return `Daily at ${hour.padStart(2, '0')}:${min.padStart(2, '0')}`;
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  return `${days[+dow] || dow} at ${hour.padStart(2, '0')}:${min.padStart(2, '0')}`;
+}
+
+function formatRelativeTime(ms?: number) {
+  if (!ms) return 'Never';
+  const ago = Date.now() - ms;
+  if (ago < 60_000) return 'Just now';
+  if (ago < 3600_000) return `${Math.floor(ago / 60_000)}m ago`;
+  if (ago < 86400_000) return `${Math.floor(ago / 3600_000)}h ago`;
+  return `${Math.floor(ago / 86400_000)}d ago`;
+}
 
 type ScheduledTask = {
   _id: string;
@@ -40,6 +80,8 @@ function colorForAgent(agent: string) {
 export default function CalendarClient() {
   const [weekOffset, setWeekOffset] = useState(0);
   const [selectedTask, setSelectedTask] = useState<ScheduledTask | null>(null);
+  const cronJobs = useQuery(convexApi.cronJobs.list, {}) as CronJob[] | undefined;
+  const setEnabled = useMutation(convexApi.cronJobs.setEnabled);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -141,6 +183,102 @@ export default function CalendarClient() {
       </div>
 
       <TaskDrawer task={selectedTask} onClose={() => setSelectedTask(null)} />
+
+      {/* Cron Jobs Panel */}
+      <div className="mt-8">
+        <h2 className="text-sm font-semibold text-[#e6edf3] mb-3 flex items-center gap-2">
+          <Clock className="w-4 h-4 text-[#8b949e]" />
+          Cron Jobs
+        </h2>
+        {!cronJobs && <div className="text-xs text-[#6e7681]">Loading...</div>}
+        {cronJobs && cronJobs.length === 0 && (
+          <div className="text-xs text-[#6e7681]">No cron jobs synced yet. Sync daemon will populate these.</div>
+        )}
+        {cronJobs && cronJobs.length > 0 && (
+          <div className="bg-[#161b22] border border-[#30363d] rounded-lg overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[#30363d] text-[#6e7681] text-xs">
+                  <th className="text-left px-4 py-2 font-medium">Job</th>
+                  <th className="text-left px-4 py-2 font-medium">Agent</th>
+                  <th className="text-left px-4 py-2 font-medium">Schedule</th>
+                  <th className="text-left px-4 py-2 font-medium">Last Run</th>
+                  <th className="text-left px-4 py-2 font-medium">Status</th>
+                  <th className="text-right px-4 py-2 font-medium">Enabled</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[...cronJobs]
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .map((job) => {
+                    const hasErrors = (job.consecutiveErrors ?? 0) > 0;
+                    return (
+                      <tr
+                        key={job._id}
+                        className={`border-b border-[#30363d] last:border-b-0 ${
+                          !job.enabled ? 'opacity-50' : ''
+                        }`}
+                      >
+                        <td className="px-4 py-2.5 text-[#e6edf3]">{job.name}</td>
+                        <td className="px-4 py-2.5 text-[#8b949e]">
+                          {AGENT_LABELS[job.agentId] || job.agentId}
+                        </td>
+                        <td className="px-4 py-2.5 text-[#8b949e] text-xs">
+                          {formatSchedule(job.schedule)}
+                          {job.tz && <span className="text-[#6e7681] ml-1">({job.tz})</span>}
+                        </td>
+                        <td className="px-4 py-2.5 text-[#8b949e] text-xs">
+                          {formatRelativeTime(job.lastRunAtMs)}
+                        </td>
+                        <td className="px-4 py-2.5">
+                          <div className="flex items-center gap-1.5">
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                job.lastStatus === 'ok'
+                                  ? 'bg-[#3fb950]'
+                                  : job.lastStatus === 'error'
+                                    ? 'bg-[#f85149]'
+                                    : 'bg-[#6e7681]'
+                              }`}
+                            />
+                            <span className="text-xs text-[#8b949e]">
+                              {job.lastStatus || 'unknown'}
+                            </span>
+                            {hasErrors && (
+                              <span className="flex items-center gap-0.5 text-[10px] text-[#f85149]">
+                                <AlertTriangle className="w-3 h-3" />
+                                {job.consecutiveErrors}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-2.5 text-right">
+                          <button
+                            onClick={() =>
+                              setEnabled({ jobId: job.jobId, enabled: !job.enabled })
+                            }
+                            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                              job.enabled
+                                ? 'bg-[#238636]'
+                                : 'bg-[#21262d] border border-[#30363d]'
+                            }`}
+                            title={job.enabled ? 'Click to disable' : 'Click to enable'}
+                          >
+                            <span
+                              className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${
+                                job.enabled ? 'translate-x-4' : 'translate-x-0.5'
+                              }`}
+                            />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </>
   );
 }
