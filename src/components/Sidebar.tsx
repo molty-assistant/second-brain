@@ -15,6 +15,7 @@ import {
   Users,
   ClipboardList,
   Settings,
+  BookOpen,
 } from 'lucide-react';
 
 interface DocumentMeta {
@@ -155,6 +156,17 @@ export default function Sidebar({ documents, journalEntries }: SidebarProps) {
             >
               <Search className="w-4 h-4" />
               <span>Search</span>
+            </Link>
+            <Link
+              href="/memory"
+              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
+                pathname === '/memory'
+                  ? 'bg-[#21262d] text-[#e6edf3]'
+                  : 'text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d]/50'
+              }`}
+            >
+              <BookOpen className="w-4 h-4" />
+              <span>Daily Memory</span>
             </Link>
           </div>
         </div>

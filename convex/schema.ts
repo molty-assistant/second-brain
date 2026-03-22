@@ -122,4 +122,20 @@ export default defineSchema({
       searchField: "title",
       filterFields: ["status", "assignedTo"],
     }),
+
+  dailyLogs: defineTable({
+    date: v.string(), // ISO date string: "2026-03-22"
+    timestamp: v.number(), // Unix ms (for ordering)
+    summary: v.string(),
+    projects: v.optional(v.array(v.string())), // ["letready", "marketing-tool"]
+    decisions: v.optional(v.array(v.string())),
+    actionItems: v.optional(v.array(v.string())),
+    tags: v.optional(v.array(v.string())),
+  })
+    .index("by_date", ["date"])
+    .index("by_timestamp", ["timestamp"])
+    .searchIndex("search_summary", {
+      searchField: "summary",
+      filterFields: ["date"],
+    }),
 });
